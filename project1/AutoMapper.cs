@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Dto;
-using Model;
+using Repository.Models;
 namespace Api
 {
     public class AutoMapper : Profile
@@ -8,11 +8,13 @@ namespace Api
         public AutoMapper()
         {
             CreateMap<User, DtoUser_Gmail_Password>().ReverseMap();
+            CreateMap<Style,DtoSyle_id_name>().ReverseMap();
             CreateMap<User, DtoUser_Id_Name>().ReverseMap();
-            CreateMap<PassWord, DtoPassword_Password_Strength>().ReverseMap();
+            //CreateMap<PassWord, DtoPassword_Password_Strength>().ReverseMap();
             CreateMap<User, DtoUser_Name_Password_Gmail>().ReverseMap();
             CreateMap<User, DtoUser_Name_Gmail>().ReverseMap();
             CreateMap<Category, DtoCategory_Name_Id>().ReverseMap();
+            CreateMap<DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds, Product>();
             //CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>().ForMember(dest => dest.Name,
             //                                              opts => opts.MapFrom(src => src.Category.Name));
             CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>()

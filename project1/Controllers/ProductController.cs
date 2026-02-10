@@ -1,6 +1,5 @@
 ﻿using Dto;
 using Microsoft.AspNetCore.Mvc;
-using Model;
 using Services;
 using System.Collections.Generic;
 
@@ -20,12 +19,27 @@ namespace Api.Controllers
             _logger = logger;
         }
         // GET: api/<CategoryController>
-    [HttpGet]
-    public async Task<(IEnumerable<DtoProduct_Id_Name_Category_Price_Desc_Image>, int TotalCount)> Gets([FromBody] int position, int skip, string? desc, int? minPrice, int? maxPrice, int?[] categoryIds)
-    {
-      return await _s.GetProducts(position,skip,desc,minPrice,maxPrice,categoryIds);
+        [HttpGet]
+        public async Task<(IEnumerable<DtoProduct_Id_Name_Category_Price_Desc_Image>, int TotalCount)> Gets([FromBody] int position, int skip, string? desc, int? minPrice, int? maxPrice, [FromQuery] int?[] categoryIds)
+        {
+          return await _s.GetProducts(position,skip,desc,minPrice,maxPrice,categoryIds);
+        }
+
+        // POST api/<users>
+
+        [HttpPost]
+        public async Task<ActionResult<DtoProduct_Id_Name_Category_Price_Desc_Image>> Post([FromBody] DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds productDto)
+        {
+
+            DtoProduct_Id_Name_Category_Price_Desc_Image res = await _s.AddNewProduct(productDto);
+            if (res != null)
+            {
+                return CreatedAtAction(nameof(Gets), new { id = res.ProductId }, res);
+            }
+            else
+                return BadRequest();
+        }
     }
-  }
 }
 
 

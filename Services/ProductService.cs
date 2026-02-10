@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dto;
-using Model;
 using Repository;
 using Repository.Models;
 using System;
@@ -27,10 +26,16 @@ namespace Services
             var r = _mapper.Map<List<Product>, List<DtoProduct_Id_Name_Category_Price_Desc_Image>>(u.Items);
             return (r, u.TotalCount);
         }
-        public async Task<Product> AddNewProduct(Product product)
+        public async Task<DtoProduct_Id_Name_Category_Price_Desc_Image> AddNewProduct(DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds productDto)
         {
+            var productEntity = _mapper.Map<Product>(productDto);
+            productEntity.ProductStyles = productDto.StyleIds.Select(id => new ProductStyle
+            {
+                StyleId = id
+            }).ToList();
 
+            var savedProduct = await _r.AddNewProduct(productEntity);
+            return _mapper.Map<DtoProduct_Id_Name_Category_Price_Desc_Image>(savedProduct);
         }
-
-  }
+    }
 }

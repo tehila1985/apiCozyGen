@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Dto
 {
-    internal class DtoSyle_id_name
+    public class DtoSyle_id_name
     {
+        public int StyleId { get; set; }
+
+        [Required]
+        [StringLength(150)]
+        public string Name { get; set; }
     }
 }

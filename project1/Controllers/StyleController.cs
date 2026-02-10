@@ -1,43 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
+﻿using Dto;
+using Microsoft.AspNetCore.Mvc;
+using Services;
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class StyleController : ControllerBase
     {
-        // GET: api/<StyleController>
+        ILogger<StyleController> _logger;
+        IStyleService _s;
+        public StyleController(IStyleService i, ILogger<StyleController> logger)
+        {
+            _s = i;
+            _logger = logger;
+        }
+        // GET: api/<CategoryController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<DtoSyle_id_name>> Get()
         {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<StyleController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<StyleController>
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/<StyleController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<StyleController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return await _s.GetStyles();
         }
     }
 }

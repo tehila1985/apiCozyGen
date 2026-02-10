@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Model;
-using Model;
+
 using NLog.Web;
 using Repository;
+using Repository.Models;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,7 +19,7 @@ builder.Services.AddDbContext<myDBContext>(options =>
 });
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-builder.Services.AddScoped<IUserServices,UserServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
 
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -30,6 +30,8 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IStyleService, StyleService>();
+builder.Services.AddScoped<IStyleRepository, StyleRepository>();
 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();

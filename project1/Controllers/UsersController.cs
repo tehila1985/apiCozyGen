@@ -4,8 +4,8 @@ using System.Collections.Specialized;
 using System.Text.Json;
 using Services;
 using static project1.Controllers.Userscontroller;
-using Model;
 using Dto;
+using Repository.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -64,7 +64,7 @@ namespace project1.Controllers
             DtoUser_Id_Name res = await _s.Login(user);
             if(res!=null)
             {
-                _logger.LogInformation($"login attempted with user name,{user.Gmail} and password {user.Password}");
+                _logger.LogInformation($"login attempted with user name,{user.Email} and password {user.PasswordHash}");
                 return Ok(res);
             }  
             return NotFound();
