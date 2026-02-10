@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="login.js" defer></script>
+    <title>webApi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            width: 250px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 8px;
+            border: none;
+            background: #3498db;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #217dbb;
+            }
+
+        .new {
+            text-align: center;
+            color: #3498db;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .newUser {
+            display:block;
+        }
+
+        progress {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form class="existUser">
+            <h3>משתמש רשום</h3>
+            <label id="userName">שם משתמש</label>
+            <input type="email" id="userName" class="userName" required />
+            <label id="password">סיסמא</label>
+            <input type="password" id="password" class="password" required />
+            <button type="button" onClick="signIn()" class="button">שליחה</button>
+            <div class="new" onclick="openSignUp()"> משתמש חדש </div>
+        </form>
+      
+        <form class="newUser">
+            <h3>משתמש חדש</h3>
+            <label for="userName">שם משתמש</label>
+            <br />
+            <input type="email" id="newUserName" name="userName" />
+            <br />
+            <label for="userName">שם פרטי</label>
+            <br />
+            <input type="text" id="newFirstName" name="firstName" />
+            <br />
+            <label for="userName">שם משפחה</label>
+            <br />
+            <input type="text" id="newLastName" name="lastName" />
+            <br />
+            <label for="password">סיסמא</label>
+            <br />
+            <input type="password" id="newPassword" name="password" />
+            <progress value="0" max="4"></progress>
+            <button id="checkPassStrength" type="button" onClick="colorDrawing()">check password strength</button>
+            <button type="button" onClick="signUp()" class="button">שליחה</button>
+        </form>
+
+    </div>
+</body>
+</html>

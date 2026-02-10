@@ -1,0 +1,1 @@
+2025-12-15 18:50:59.4732|0|INFO|project1.Controllers.Userscontroller|login attempted with user name,t@t and password tehilaT123 |url: https://localhost/api/Users/Login|action: Login|project1.Controllers.Userscontroller.Login| body: 
