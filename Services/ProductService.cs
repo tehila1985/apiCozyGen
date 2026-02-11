@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Dto;
+using Microsoft.AspNetCore.Mvc;
 using Repository;
 using Repository.Models;
 using System;
@@ -20,7 +21,12 @@ namespace Services
                  _mapper= mapper;
              }
 
-        public async Task<(IEnumerable<DtoProduct_Id_Name_Category_Price_Desc_Image>,int TotalCount)> GetProducts(int position, int skip, string? desc, int? minPrice, int? maxPrice, int?[] categoryIds)
+        public async Task<(IEnumerable<DtoProduct_Id_Name_Category_Price_Desc_Image>,int TotalCount)> GetProducts([FromQuery] int position,
+     [FromQuery] int skip,
+     [FromQuery] string? desc,
+     [FromQuery] int? minPrice,
+     [FromQuery] int? maxPrice,
+     [FromQuery] int?[] categoryIds)
         {
             var u = await _r.getProducts(position,skip,desc,minPrice, maxPrice,categoryIds);
             var r = _mapper.Map<List<Product>, List<DtoProduct_Id_Name_Category_Price_Desc_Image>>(u.Items);
@@ -29,9 +35,9 @@ namespace Services
         public async Task<DtoProduct_Id_Name_Category_Price_Desc_Image> AddNewProduct(DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds productDto)
         {
             var productEntity = _mapper.Map<Product>(productDto);
-            productEntity.ProductStyles = productDto.StyleIds.Select(id => new ProductStyle
+            productEntity.ProductStyles = productDto.ProductStyles.Select(id => new ProductStyle
             {
-                StyleId = id
+                StyleId = id.StyleId
             }).ToList();
 
             var savedProduct = await _r.AddNewProduct(productEntity);

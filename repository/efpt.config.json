@@ -39,6 +39,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[RATING]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Styles]",
          "ObjectType": 0
       },

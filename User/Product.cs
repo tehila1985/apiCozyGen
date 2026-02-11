@@ -29,6 +29,12 @@ public partial class Product
 
     public bool IsActive { get; set; }
 
+    [StringLength(500)]
+    public string FrontImageUrl { get; set; }
+
+    [StringLength(500)]
+    public string BackImageUrl { get; set; }
+
     [ForeignKey("CategoryId")]
     [InverseProperty("Products")]
     public virtual Category Category { get; set; }

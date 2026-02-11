@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 using Repository.Models;
 using System;
@@ -16,7 +17,12 @@ namespace Repository
     {
       this.dbContext = dbContext;
     }
-   public async Task<(List<Product> Items, int TotalCount)> getProducts(int position, int skip, string? desc, int? minPrice, int? maxPrice, int?[] categoryIds)
+   public async Task<(List<Product> Items, int TotalCount)> getProducts([FromQuery] int position,
+     [FromQuery] int skip,
+     [FromQuery] string? desc,
+     [FromQuery] int? minPrice,
+     [FromQuery] int? maxPrice,
+     [FromQuery] int?[] categoryIds)
  {
             var query = dbContext.Products.Where(product =>
                 (desc == null ? (true) : (product.Description.Contains(desc)))

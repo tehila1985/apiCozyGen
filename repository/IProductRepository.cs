@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Mvc;
 using Repository.Models;
 
 namespace Repository
@@ -7,6 +8,11 @@ namespace Repository
   {
         
         Task<Product> AddNewProduct(Product product);
-       Task<(List<Product> Items, int TotalCount)> getProducts(int position, int skip, string? desc, int? minPrice, int? maxPrice, int?[] categoryIds);
+       Task<(List<Product> Items, int TotalCount)> getProducts([FromQuery] int position,
+     [FromQuery] int skip,
+     [FromQuery] string? desc,
+     [FromQuery] int? minPrice,
+     [FromQuery] int? maxPrice,
+     [FromQuery] int?[] categoryIds);
   }
 }

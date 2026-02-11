@@ -69,24 +69,14 @@ namespace Services
         //}
         public async Task<DtoUser_Id_Name> update(int id, DtoUser_Name_Password_Gmail userDto)
         {
-            // 1. בדיקת חוזק סיסמה
+           
             int d = _passwordService.getStrengthByPassword(userDto.PasswordHash);
             if (d < 2) return null;
 
-            // 2. שליפת המשתמש המלא מהמסד (כדי לשמור על ה-Role ושדות אחרים שלא ב-DTO)
             var existingUser = await _r.GetUserById(id);
             if (existingUser == null) return null;
-
-            // 3. שימוש ב-AutoMapper לעדכון האובייקט הקיים
-            // הדרך הזו מעתיקה את FirstName, LastName, Email ו-PasswordHash 
-            // מה-DTO לתוך ה-existingUser באופן אוטומטי.
             _mapper.Map(userDto, existingUser);
-
-            // 4. חשוב: בגלל שה-DTO מכיל UserId, המאפר עלול לנסות לעדכן אותו. 
-            // כדי להיות בטוחות שהמפתח לא משתנה (מה שגרם לשגיאה קודם), נקבע אותו שוב:
             existingUser.UserId = id;
-
-            // 5. שמירה (ה-Role המקורי נשאר כי הוא לא נדרס במיפוי)
             var res = await _r.update(id, existingUser);
 
             return _mapper.Map<User, DtoUser_Id_Name>(res);
@@ -95,6 +85,7 @@ namespace Services
         {
             _r.Delete(id);
         }
+        //k
 
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
 
 namespace Dto
 {
@@ -22,8 +23,15 @@ namespace Dto
         public int? Price { get; set; } 
 
         public string Description { get; set; }
-        public string ImageUrl { get; set; }
+
+        [StringLength(500)]
+        public string FrontImageUrl { get; set; }
+
+        [StringLength(500)]
+        public string BackImageUrl { get; set; }
+
         public virtual ICollection<DtoProductStyle> ProductStyles { get; set; } = new List<DtoProductStyle>();
 
     }
 }
+

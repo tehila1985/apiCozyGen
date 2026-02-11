@@ -23,6 +23,8 @@ public partial class myDBContext : DbContext
 
     public virtual DbSet<ProductStyle> ProductStyles { get; set; }
 
+    public virtual DbSet<Rating> Ratings { get; set; }
+
     public virtual DbSet<Style> Styles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -80,6 +82,12 @@ public partial class myDBContext : DbContext
             entity.HasOne(d => d.Style).WithMany(p => p.ProductStyles)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ProductStyles_Styles");
+        });
+
+        modelBuilder.Entity<Rating>(entity =>
+        {
+            entity.Property(e => e.Method).IsFixedLength();
+            entity.Property(e => e.RecordDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<Style>(entity =>
