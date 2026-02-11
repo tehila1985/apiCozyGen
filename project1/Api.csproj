@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <None Include="M:\‏‏רבקה ותהילה - עותק\project1\.editorconfig" />
-    <None Include="wwwroot\login.html" />
-    <None Include="wwwroot\login.js" />
   </ItemGroup>
 
   <ItemGroup>

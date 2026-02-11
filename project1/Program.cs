@@ -4,39 +4,48 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-
 using NLog.Web;
 using Repository;
 using Repository.Models;
 using Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Host.UseNLog();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.AddDbContext<myDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Tehila"));
 });
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
 builder.Services.AddScoped<IUserServices, UserServices>();
-
-
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
-
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IStyleService, StyleService>();
 builder.Services.AddScoped<IStyleRepository, StyleRepository>();
-
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
-var app = builder.Build();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -47,9 +56,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
-// Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngular");
 
 app.UseStaticFiles();
 
