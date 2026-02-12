@@ -17,28 +17,39 @@ namespace Repository
     {
       this.dbContext = dbContext;
     }
-   public async Task<(List<Product> Items, int TotalCount)> getProducts([FromQuery] int position,
-     [FromQuery] int skip,
-     [FromQuery] string? desc,
-     [FromQuery] int? minPrice,
-     [FromQuery] int? maxPrice,
-     [FromQuery] int?[] categoryIds)
- {
-            var query = dbContext.Products.Where(product =>
-                (desc == null ? (true) : (product.Description.Contains(desc)))
-                && ((minPrice == null) ? (true) : (product.Price >= minPrice))
-                && ((maxPrice == null) ? (true) : (product.Price <= maxPrice))
-                && ((categoryIds.Length == 0) ? (true) : (categoryIds.Contains(product.CategoryId))))
-                .OrderBy(product => product.Price);
+        public async Task<(List<Product> Items, int TotalCount)> getProducts(
+           [FromQuery] int position,
+           [FromQuery] int skip,
+           [FromQuery] string? desc,
+           [FromQuery] int? minPrice,
+           [FromQuery] int? maxPrice,
+           [FromQuery] int?[] categoryIds,
+           [FromQuery] int?[] styleIds)
+        {
+            var query = dbContext.Products.AsQueryable();
 
-            Console.WriteLine(query.ToQueryString());
-            List<Product> products = await query.Skip((position - 1) * skip)
-                .Take(skip).Include(product => product.Category).ToListAsync();
+            query = query.Where(product =>
+                (desc == null || product.Description.Contains(desc))
+                && (!minPrice.HasValue || product.Price >= minPrice.Value)
+                && (!maxPrice.HasValue || product.Price <= maxPrice.Value)
+                && (categoryIds == null || categoryIds.Length == 0 || categoryIds.Contains(product.CategoryId))
+                && (styleIds == null || styleIds.Length == 0 || product.ProductStyles.Any(ps => styleIds.Contains(ps.StyleId)))
+            );
+
+            query = query.OrderBy(product => product.Price);
 
             var total = await query.CountAsync();
 
+            int recordsToSkip = (position > 0) ? (position - 1) * skip : 0;
+
+            List<Product> products = await query
+                .Skip(recordsToSkip)
+                .Take(skip)
+                .Include(product => product.Category)
+                .ToListAsync();
+
             return (products, total);
-    }
+        }
         public async Task<Product> AddNewProduct(Product product)
         {
 
