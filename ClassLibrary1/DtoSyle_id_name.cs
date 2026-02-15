@@ -22,3 +22,13 @@ namespace Dto
         public string ImageUrl { get; set; }
     }
 }
+//public record DtoSyle_id_name(
+//    int StyleId,
+//    [property: Required]
+//    [property: StringLength(150)]
+//    string Name,
+//    [property: StringLength(500)]
+//    string Description,
+//    [property: StringLength(500)]
+//    string ImageUrl
+//);

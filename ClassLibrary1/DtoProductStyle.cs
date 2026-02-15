@@ -18,3 +18,8 @@ namespace Dto
         public int StyleId { get; set; }
     }
 }
+//public record DtoProductStyle(
+//      [property: Key] int ProductStyleId,
+//      int ProductId,
+//      int StyleId
+//  );

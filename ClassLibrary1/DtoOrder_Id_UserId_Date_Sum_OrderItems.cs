@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace Dto
@@ -32,5 +33,16 @@ namespace Dto
     }
 }
 
+//   public record DtoOrder_Id_UserId_Date_Sum_OrderItems(
+//int OrderId,
+//           int UserId,
 
+//[property: Column(TypeName = "datetime")]
+//        DateTime OrderDate,
+//           [property: Required, StringLength(50)]
+//        string Status,
+//           [property: Column(TypeName = "decimal(10, 2)")]
+//        decimal TotalPrice,
+//           ICollection<DtoOrderItem_Id_OrderId_ProductId_Quantity> OrderItems
+//       );
 

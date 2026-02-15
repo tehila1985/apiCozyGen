@@ -16,3 +16,16 @@ namespace Dto
         public string PasswordHash { get; set; }
     }
 }
+
+
+
+//public record DtoUser_Name_Password_Gmail(
+//    int UserId,
+//    [property: Required(ErrorMessage = "Gmail is required")]
+//    [property: EmailAddress(ErrorMessage = "Invalid email")]
+//    string Email,
+//    string FirstName,
+//    string LastName,
+//    [property: Required(ErrorMessage = "Password is required")]
+//    string PasswordHash
+//);

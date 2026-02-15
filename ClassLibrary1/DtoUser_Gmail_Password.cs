@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dto
 {
-    //public record DtoUser_Gmail_Password(string Gmail,string Password);
+   
     public class DtoUser_Gmail_Password
     {
 
@@ -16,3 +16,10 @@ namespace Dto
     }
 }
 
+//public record DtoUser_Gmail_Password(
+//      [property: Required(ErrorMessage = "Gmail is required")]
+//    [property: EmailAddress(ErrorMessage = "Invalid email format.")]
+//    string Email,
+//      [property: Required(ErrorMessage = "Password is required")]
+//    string PasswordHash
+//  );

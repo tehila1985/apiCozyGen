@@ -16,3 +16,4 @@ namespace Dto
         public string Name { get; set; }
     }
 }
+// public record DtoCategory_Name_Id(int CategoryId, string Name);

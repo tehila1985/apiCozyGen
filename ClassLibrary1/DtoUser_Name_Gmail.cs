@@ -25,3 +25,12 @@ namespace Dto
 
 }
 
+
+//public record DtoUser_Name_Gmail(
+//    int UserId,
+//    [property: Required(ErrorMessage = "Gmail is required")]
+//    [property: EmailAddress(ErrorMessage = "Invalid email format.")]
+//    string Email,
+//    string FirstName,
+//    string LastName
+//);

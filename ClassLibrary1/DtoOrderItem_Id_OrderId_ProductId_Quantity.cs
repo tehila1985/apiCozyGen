@@ -23,3 +23,10 @@ namespace Dto
 }
 
 
+//public record DtoOrderItem_Id_OrderId_ProductId_Quantity(
+//      int OrderItemId,
+//      int OrderId,
+//      string ItemName,
+//      int? ProductId,
+//      int Quantity
+//  );
