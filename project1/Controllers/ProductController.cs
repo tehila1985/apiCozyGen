@@ -19,16 +19,14 @@ namespace Api.Controllers
             _logger = logger;
         }
         [HttpGet]
-
-        [HttpGet]
-        public async Task<(IEnumerable<DtoProduct_Id_Name_Category_Price_Desc_Image>, int TotalCount)> Gets(
+        public async Task<Dto_result_product> Gets(
     [FromQuery] int position,
     [FromQuery] int skip,
     [FromQuery] string? desc,
     [FromQuery] int? minPrice,
     [FromQuery] int? maxPrice,
     [FromQuery] int?[] categoryIds,
-    [FromQuery] int?[] styleIds) // הווספת פרמטר ייעודי לסגנונות
+    [FromQuery] int?[] styleIds) 
         {
             return await _s.GetProducts(position, skip, desc, minPrice, maxPrice, categoryIds, styleIds);
         }
