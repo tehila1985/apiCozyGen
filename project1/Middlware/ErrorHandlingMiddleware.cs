@@ -8,23 +8,32 @@ namespace Api.Middlware
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger _logger;
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+        public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
-        public Task Invoke(HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext)
         {
-
-            return _next(httpContext);
+            try
+            {
+                await _next(httpContext);
+            }
+            catch (Exception ex)
+            {
+                httpContext.Response.StatusCode = 500;
+                _logger.LogError(ex + " call stack: " + ex.StackTrace);
+            }
         }
     }
 
     // Extension method used to add the middleware to the HTTP request pipeline.
-    public static class ErrorHandlingMiddlewareExtensions
+    public static class ErrorHandlingExtensions
     {
-        public static IApplicationBuilder UseErrorHandlingMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseErrorHandling(this IApplicationBuilder builder)
         {
             return builder.UseMiddleware<ErrorHandlingMiddleware>();
         }

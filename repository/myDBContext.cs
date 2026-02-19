@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repository.Models;

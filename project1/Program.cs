@@ -1,4 +1,5 @@
 ﻿using Api;
+using Api.Middlware;
 using FluentAssertions.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,8 @@ builder.Services.AddDbContext<myDBContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-
+builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -59,6 +61,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAngular");
+
+app.UseErrorHandling();
+
+app.UseRating();
 
 app.UseStaticFiles();
 
