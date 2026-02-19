@@ -87,7 +87,6 @@ public partial class myDBContext : DbContext
         modelBuilder.Entity<Rating>(entity =>
         {
             entity.Property(e => e.Method).IsFixedLength();
-            entity.Property(e => e.RecordDate).HasDefaultValueSql("(getdate())");
         });
 
         modelBuilder.Entity<Style>(entity =>
