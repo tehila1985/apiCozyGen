@@ -1,131 +1,170 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using Moq.EntityFrameworkCore;
 using Repository;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Repository.Models;
 using Xunit;
 
-namespace Tests
+namespace Test
 {
     public class UserRepositoryUnitTests
     {
-        private readonly Mock<myDBContext> mockContext;
-        private readonly UserRepository userRepository;
-
-        public UserRepositoryUnitTests()
-        {
-            mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
-            userRepository = new UserRepository(mockContext.Object);
-        }
-
         [Fact]
-        public async Task AddNewUser_ShouldAddUser_WithValidData()
-        {
-            var user = new User { Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User>());
-
-            var result = await userRepository.AddNewUser(user);
-
-            Assert.NotNull(result);
-            Assert.Equal(user.Email, result.Email);
-        }
-
-        [Fact]
-        public async Task GetUserById_ShouldReturnUser_WhenUserExists()
-        {
-            var user = new User { UserId = 1, Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User> { user });
-
-            var result = await userRepository.GetUserById(1);
-
-            Assert.NotNull(result);
-            Assert.Equal(user.Email, result.Email);
-        }
-
-        [Fact]
-        public async Task GetUsers_ShouldReturnListOfUsers_WhenUsersExist()
+        public async Task GetUsers_ReturnsAllUsers()
         {
             var users = new List<User>
             {
-                new User { Email = "user1@example.com", PasswordHash = "Password1", FirstName = "User", LastName = "One", Role = "Customer", IsClubMember = false },
-                new User { Email = "user2@example.com", PasswordHash = "Password2", FirstName = "User", LastName = "Two", Role = "Customer", IsClubMember = false }
+                new User { UserId = 1, Email = "user1@test.com", PasswordHash = "hash1", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false },
+                new User { UserId = 2, Email = "user2@test.com", PasswordHash = "hash2", FirstName = "Jane", LastName = "Smith", Role = "Admin", IsClubMember = true }
             };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(users);
 
-            var result = await userRepository.GetUsers();
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<User>(users.AsQueryable().Provider));
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.AsQueryable().Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<User>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<User>(users.GetEnumerator()));
 
-            Assert.NotNull(result);
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+
+            var repository = new UserRepository(mockContext.Object);
+            var result = await repository.GetUsers();
+
             Assert.Equal(2, result.Count);
+            Assert.Equal("user1@test.com", result[0].Email);
+            Assert.Equal("user2@test.com", result[1].Email);
         }
 
         [Fact]
-        public async Task Login_ShouldReturnUser_WithValidCredentials()
+        public async Task GetUserById_ReturnsUser_WhenUserExists()
         {
-            var user = new User { Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User> { user });
+            var users = new List<User>
+            {
+                new User { UserId = 1, Email = "user1@test.com", PasswordHash = "hash1", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false }
+            };
 
-            var result = await userRepository.Login(user);
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<User>(users.AsQueryable().Provider));
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.AsQueryable().Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+
+            var repository = new UserRepository(mockContext.Object);
+            var result = await repository.GetUserById(1);
 
             Assert.NotNull(result);
-            Assert.Equal(user.Email, result.Email);
+            Assert.Equal(1, result.UserId);
+            Assert.Equal("user1@test.com", result.Email);
         }
 
         [Fact]
-        public async Task Update_ShouldModifyUser_WhenValidDataProvided()
+        public async Task GetUserById_ReturnsNull_WhenUserDoesNotExist()
         {
-            var user = new User { UserId = 1, Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User> { user });
+            var users = new List<User>();
 
-            user.PasswordHash = "NewStrongPassword456";
-            var result = await userRepository.update(user.UserId, user);
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<User>(users.AsQueryable().Provider));
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.AsQueryable().Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
 
-            Assert.NotNull(result);
-            Assert.Equal(user.PasswordHash, result.PasswordHash);
-        }
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
-
-        [Fact]
-        public async Task GetUserById_ShouldReturnNull_WhenUserDoesNotExist()
-        {
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User>());
-
-            var result = await userRepository.GetUserById(9999);
+            var repository = new UserRepository(mockContext.Object);
+            var result = await repository.GetUserById(999);
 
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task Login_ShouldReturnNull_WhenInvalidCredentialsProvided()
+        public async Task AddNewUser_AddsUserToDatabase()
         {
-            var user = new User { Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User> { user });
+            var mockSet = new Mock<DbSet<User>>();
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+            mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
-            var loginUser = new User { Email = "valid.email@example.com", PasswordHash = "WrongPassword" };
-            var result = await userRepository.Login(loginUser);
+            var repository = new UserRepository(mockContext.Object);
+            var newUser = new User { Email = "new@test.com", PasswordHash = "hash", FirstName = "New", LastName = "User", Role = "User", IsClubMember = false };
+            
+            var result = await repository.AddNewUser(newUser);
+
+            mockSet.Verify(m => m.AddAsync(newUser, default), Times.Once);
+            mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            Assert.Equal(newUser, result);
+        }
+
+        [Fact]
+        public async Task Login_ReturnsUser_WhenCredentialsMatch()
+        {
+            var users = new List<User>
+            {
+                new User { UserId = 1, Email = "user@test.com", PasswordHash = "correcthash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false }
+            };
+
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<User>(users.AsQueryable().Provider));
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.AsQueryable().Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+
+            var repository = new UserRepository(mockContext.Object);
+            var loginUser = new User { Email = "user@test.com", PasswordHash = "correcthash" };
+            
+            var result = await repository.Login(loginUser);
+
+            Assert.NotNull(result);
+            Assert.Equal("user@test.com", result.Email);
+        }
+
+        [Fact]
+        public async Task Login_ReturnsNull_WhenCredentialsDoNotMatch()
+        {
+            var users = new List<User>
+            {
+                new User { UserId = 1, Email = "user@test.com", PasswordHash = "correcthash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false }
+            };
+
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<User>(users.AsQueryable().Provider));
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(users.AsQueryable().Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
+
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+
+            var repository = new UserRepository(mockContext.Object);
+            var loginUser = new User { Email = "user@test.com", PasswordHash = "wronghash" };
+            
+            var result = await repository.Login(loginUser);
 
             Assert.Null(result);
         }
 
+        [Fact]
+        public async Task Update_UpdatesUserInDatabase()
+        {
+            var mockSet = new Mock<DbSet<User>>();
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+            mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
-        //לא עובד!!!
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenEmailInvalid()
-        //{
-        //  var user = new User { Email = "invalidEmail", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-        //  mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User>());
+            var repository = new UserRepository(mockContext.Object);
+            var updatedUser = new User { UserId = 1, Email = "updated@test.com", PasswordHash = "hash", FirstName = "Updated", LastName = "User", Role = "User", IsClubMember = true };
+            
+            var result = await repository.update(1, updatedUser);
 
-        //  await Assert.ThrowsAsync<DbUpdateException>(() => userRepository.AddNewUser(user));
-        //}
-        //לא עובד!!!
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenPasswordTooShort()
-        //{
-        //  var user = new User { Email = "valid.email@example.com", PasswordHash = "short", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-        //  mockContext.Setup(c => c.Users).ReturnsDbSet(new List<User>());
-
-        //  await Assert.ThrowsAsync<DbUpdateException>(() => userRepository.AddNewUser(user));
-        //}
+            mockSet.Verify(m => m.Update(updatedUser), Times.Once);
+            mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);
+            Assert.Equal(updatedUser, result);
+        }
     }
 }

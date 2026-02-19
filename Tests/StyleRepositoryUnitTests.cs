@@ -1,106 +1,117 @@
 using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Moq;
-using Moq.EntityFrameworkCore;
 using Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Repository.Models;
 using Xunit;
 
-namespace Tests
+namespace Test
 {
     public class StyleRepositoryUnitTests
     {
-        private readonly Mock<myDBContext> mockContext;
-        private readonly StyleRepository styleRepository;
-
-        public StyleRepositoryUnitTests()
+        [Fact]
+        public async Task GetStyles_ReturnsAllStyles()
         {
-            mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
-            styleRepository = new StyleRepository(mockContext.Object);
-        }
-
-        // ===== Sample Data =====
-        private List<Style> CreateSampleStyles()
-        {
-            return new List<Style>
+            var styles = new List<Style>
             {
-                new Style
-                {
-                    StyleId = 1,
-                    Name = "Modern",
-                    Description = "Modern style",
-                    ImageUrl = "http://example.com/modern.png"
-                },
-                new Style
-                {
-                    StyleId = 2,
-                    Name = "Classic",
-                    Description = "Classic style",
-                    ImageUrl = "http://example.com/classic.png"
-                },
-                new Style
-                {
-                    StyleId = 3,
-                    Name = "Minimalist",
-                    Description = "Minimalist style",
-                    ImageUrl = "http://example.com/minimalist.png"
-                }
+                new Style { StyleId = 1, Name = "Modern", Description = "Modern style", ImageUrl = "modern.jpg" },
+                new Style { StyleId = 2, Name = "Classic", Description = "Classic style", ImageUrl = "classic.jpg" }
             };
+
+            var mockSet = new Mock<DbSet<Style>>();
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Style>(styles.AsQueryable().Provider));
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Expression).Returns(styles.AsQueryable().Expression);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.ElementType).Returns(styles.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
+
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
+
+            var repository = new StyleRepository(mockContext.Object);
+            var result = await repository.GetStyles();
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Modern", result[0].Name);
+            Assert.Equal("Classic", result[1].Name);
         }
 
         [Fact]
-        public async Task GetStyles_ShouldReturnAllStyles_WhenExist()
+        public async Task GetStyles_ReturnsEmptyList_WhenNoStyles()
         {
-            var styles = CreateSampleStyles();
-            mockContext.Setup(c => c.Styles).ReturnsDbSet(styles);
+            var styles = new List<Style>();
 
-            var result = await styleRepository.GetStyles();
+            var mockSet = new Mock<DbSet<Style>>();
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Style>(styles.AsQueryable().Provider));
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Expression).Returns(styles.AsQueryable().Expression);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.ElementType).Returns(styles.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
-            Assert.Contains(result, s => s.Name == "Modern");
-            Assert.Contains(result, s => s.Name == "Classic");
-            Assert.Contains(result, s => s.Name == "Minimalist");
-        }
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
 
-        [Fact]
-        public async Task GetStyles_ShouldReturnEmptyList_WhenNoStylesExist()
-        {
-            mockContext.Setup(c => c.Styles).ReturnsDbSet(new List<Style>());
+            var repository = new StyleRepository(mockContext.Object);
+            var result = await repository.GetStyles();
 
-            var result = await styleRepository.GetStyles();
-
-            Assert.NotNull(result);
             Assert.Empty(result);
         }
 
         [Fact]
-        public async Task GetStyles_ShouldReturnStylesWithCorrectProperties()
+        public async Task GetStyles_ReturnsStyles_WithAllProperties()
         {
-            var styles = CreateSampleStyles();
-            mockContext.Setup(c => c.Styles).ReturnsDbSet(styles);
+            var styles = new List<Style>
+            {
+                new Style { StyleId = 1, Name = "Minimalist", Description = "Minimalist design", ImageUrl = "minimalist.jpg" }
+            };
 
-            var result = await styleRepository.GetStyles();
+            var mockSet = new Mock<DbSet<Style>>();
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Style>(styles.AsQueryable().Provider));
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Expression).Returns(styles.AsQueryable().Expression);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.ElementType).Returns(styles.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            var modernStyle = result.FirstOrDefault(s => s.Name == "Modern");
-            Assert.NotNull(modernStyle);
-            Assert.Equal("Modern style", modernStyle.Description);
-            Assert.Equal("http://example.com/modern.png", modernStyle.ImageUrl);
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
+
+            var repository = new StyleRepository(mockContext.Object);
+            var result = await repository.GetStyles();
+
+            Assert.Single(result);
+            Assert.Equal("Minimalist", result[0].Name);
+            Assert.Equal("Minimalist design", result[0].Description);
+            Assert.Equal("minimalist.jpg", result[0].ImageUrl);
         }
 
         [Fact]
-        public async Task GetStyles_ShouldReturnSingleStyle_WhenOnlyOneExists()
+        public async Task GetStyles_ReturnsMultipleStyles()
         {
-            var style = new Style { StyleId = 1, Name = "Vintage", Description = "Vintage style" };
-            mockContext.Setup(c => c.Styles).ReturnsDbSet(new List<Style> { style });
+            var styles = new List<Style>
+            {
+                new Style { StyleId = 1, Name = "Modern", Description = "Modern style", ImageUrl = "modern.jpg" },
+                new Style { StyleId = 2, Name = "Classic", Description = "Classic style", ImageUrl = "classic.jpg" },
+                new Style { StyleId = 3, Name = "Rustic", Description = "Rustic style", ImageUrl = "rustic.jpg" },
+                new Style { StyleId = 4, Name = "Industrial", Description = "Industrial style", ImageUrl = "industrial.jpg" }
+            };
 
-            var result = await styleRepository.GetStyles();
+            var mockSet = new Mock<DbSet<Style>>();
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Style>(styles.AsQueryable().Provider));
+            mockSet.As<IQueryable<Style>>().Setup(m => m.Expression).Returns(styles.AsQueryable().Expression);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.ElementType).Returns(styles.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            Assert.Single(result);
-            Assert.Equal("Vintage", result.First().Name);
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
+
+            var repository = new StyleRepository(mockContext.Object);
+            var result = await repository.GetStyles();
+
+            Assert.Equal(4, result.Count);
+            Assert.Contains(result, s => s.Name == "Modern");
+            Assert.Contains(result, s => s.Name == "Classic");
+            Assert.Contains(result, s => s.Name == "Rustic");
+            Assert.Contains(result, s => s.Name == "Industrial");
         }
     }
 }

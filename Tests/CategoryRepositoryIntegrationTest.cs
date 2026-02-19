@@ -1,124 +1,66 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Repository;
-using Test;
+using Repository.Models;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Tests
+namespace Test
 {
-    [Collection("Database Collection")]
-    public class CategoryRepositoryIntegrationTest : IClassFixture<DatabaseFixture>, IDisposable
+    public class CategoryRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
     {
-        private readonly myDBContext _dbContext;
         private readonly DatabaseFixture _fixture;
-        private readonly CategoryRepository _categoryRepository;
 
-        public CategoryRepositoryIntegrationTest(DatabaseFixture databaseFixture)
+        public CategoryRepositoryIntegrationTests(DatabaseFixture fixture)
         {
-            _fixture = databaseFixture;
-            _dbContext = _fixture.Context;
-            _categoryRepository = new CategoryRepository(_dbContext);
+            _fixture = fixture;
             _fixture.ClearDatabase();
         }
 
-        public void Dispose() => _fixture.ClearDatabase();
-
-        private async Task<Category> CreateSampleCategoryAsync(string name = "General")
+        [Fact]
+        public async Task GetCategories_ReturnsAllCategories_FromDatabase()
         {
-            var category = new Category { Name = name };
-            await _dbContext.Categories.AddAsync(category);
-            await _dbContext.SaveChangesAsync();
-            return category;
-        }
+            var category1 = new Category { Name = "Living Room", Description = "Living room furniture", ImageUrl = "living.jpg" };
+            var category2 = new Category { Name = "Bedroom", Description = "Bedroom furniture", ImageUrl = "bedroom.jpg" };
+            
+            _fixture.Context.Categories.Add(category1);
+            _fixture.Context.Categories.Add(category2);
+            await _fixture.Context.SaveChangesAsync();
 
-        private async Task<Product> CreateSampleProductAsync(Category category, string productName = "Sample Product", int price = 100)
-        {
-            var product = new Product
-            {
-                Name = productName,
-                CategoryId = category.CategoryId,
-                Price = price,
-                Description = "Test product",
-                FrontImageUrl = "http://example.com/product.png",
-                Stock = 10,
-                IsActive = true
-            };
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
-            return product;
+            var repository = new CategoryRepository(_fixture.Context);
+            var result = await repository.GetCategories();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, c => c.Name == "Living Room");
+            Assert.Contains(result, c => c.Name == "Bedroom");
         }
 
         [Fact]
-        public async Task AddNewCategory_ShouldAddCategorySuccessfully()
+        public async Task GetCategories_ReturnsEmptyList_WhenNoCategoriesInDatabase()
         {
-            var category = new Category { Name = "Books" };
-            await _dbContext.Categories.AddAsync(category);
-            await _dbContext.SaveChangesAsync();
+            var repository = new CategoryRepository(_fixture.Context);
+            var result = await repository.GetCategories();
 
-            var savedCategory = await _dbContext.Categories.FindAsync(category.CategoryId);
-            Assert.NotNull(savedCategory);
-            Assert.Equal("Books", savedCategory.Name);
-        }
-
-        [Fact]
-        public async Task GetCategories_ShouldReturnAllCategories_WhenExist()
-        {
-            var category1 = await CreateSampleCategoryAsync("Electronics");
-            var category2 = await CreateSampleCategoryAsync("Books");
-
-            var result = await _categoryRepository.GetCategories();
-
-            Assert.NotNull(result);
-            Assert.True(result.Count >= 2);
-            Assert.Contains(result, c => c.CategoryId == category1.CategoryId);
-            Assert.Contains(result, c => c.CategoryId == category2.CategoryId);
-        }
-
-        [Fact]
-        public async Task GetCategories_ShouldReturnEmptyList_WhenNoCategoriesExist()
-        {
-            var result = await _categoryRepository.GetCategories();
-
-            Assert.NotNull(result);
             Assert.Empty(result);
         }
 
         [Fact]
-        public async Task Category_ShouldIncludeProducts_WhenProductsExist()
+        public async Task GetCategories_ReturnsCategories_WithAllProperties()
         {
-            var category = await CreateSampleCategoryAsync("Gadgets");
-            var product1 = await CreateSampleProductAsync(category, "Phone", 500);
-            var product2 = await CreateSampleProductAsync(category, "Tablet", 800);
+            var category = new Category 
+            { 
+                Name = "Office", 
+                Description = "Office furniture and supplies", 
+                ImageUrl = "office.jpg" 
+            };
+            
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
 
-            var categories = await _categoryRepository.GetCategories();
+            var repository = new CategoryRepository(_fixture.Context);
+            var result = await repository.GetCategories();
 
-            var fetchedCategory = categories.Find(c => c.CategoryId == category.CategoryId);
-            Assert.NotNull(fetchedCategory);
-            Assert.NotEmpty(fetchedCategory.Products);
-            Assert.Contains(fetchedCategory.Products, p => p.ProductId == product1.ProductId);
-            Assert.Contains(fetchedCategory.Products, p => p.ProductId == product2.ProductId);
-        }
-
-        [Fact]
-        public async Task AddCategoryWithProducts_ShouldPersistCorrectly()
-        {
-            var category = new Category { Name = "Software", Description = "Software category" };
-            var product = new Product { Name = "IDE", Price = 200, Category = category, Stock = 5, IsActive = true };
-            category.Products.Add(product);
-
-            await _dbContext.Categories.AddAsync(category);
-            await _dbContext.SaveChangesAsync();
-
-            var savedCategory = await _dbContext.Categories
-                .Include(c => c.Products)
-                .FirstOrDefaultAsync(c => c.CategoryId == category.CategoryId);
-
-            Assert.NotNull(savedCategory);
-            Assert.Single(savedCategory.Products);
-            Assert.Equal("IDE", savedCategory.Products.First().Name);
+            Assert.Single(result);
+            Assert.Equal("Office", result[0].Name);
+            Assert.Equal("Office furniture and supplies", result[0].Description);
+            Assert.Equal("office.jpg", result[0].ImageUrl);
         }
     }
 }

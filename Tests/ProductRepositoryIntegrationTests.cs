@@ -1,147 +1,262 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Repository;
-using Test;
+using Repository.Models;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Tests
+namespace Test
 {
-    [Collection("Database Collection")]
-    public class ProductRepositoryIntegrationTests : IClassFixture<DatabaseFixture>, IDisposable
+    public class ProductRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
     {
-        private readonly myDBContext _dbContext;
         private readonly DatabaseFixture _fixture;
-        private readonly ProductRepository _productRepository;
 
-        public ProductRepositoryIntegrationTests(DatabaseFixture databaseFixture)
+        public ProductRepositoryIntegrationTests(DatabaseFixture fixture)
         {
-            _fixture = databaseFixture;
-            _dbContext = _fixture.Context;
-            _productRepository = new ProductRepository(_dbContext);
+            _fixture = fixture;
             _fixture.ClearDatabase();
         }
 
-        public void Dispose() => _fixture.ClearDatabase();
-
-        private async Task<Product> CreateSampleProductAsync(
-            string name = "Sample Product",
-            int price = 100,
-            int? categoryId = null)
+        [Fact]
+        public async Task GetProducts_ReturnsAllProducts_WithNoFilters()
         {
-            if (categoryId == null)
-            {
-                var category = new Category { Name = $"Category_{Guid.NewGuid()}", Description = "General category" };
-                await _dbContext.Categories.AddAsync(category);
-                await _dbContext.SaveChangesAsync();
-                categoryId = category.CategoryId;
-            }
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
 
-            var product = new Product
-            {
-                Name = name,
-                CategoryId = categoryId.Value,
-                Price = price,
-                Description = "Test description",
-                FrontImageUrl = "http://example.com/image.png",
-                Stock = 10,
-                IsActive = true
-            };
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
 
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
-            return product;
+            Assert.Equal(2, result.TotalCount);
+            Assert.Equal(2, result.Items.Count);
         }
 
         [Fact]
-        public async Task GetProducts_ShouldReturnAllProducts_WhenNoFilters()
+        public async Task GetProducts_FiltersBy_Description()
         {
-            var p1 = await CreateSampleProductAsync("P1", 50);
-            var p2 = await CreateSampleProductAsync("P2", 100);
-            var p3 = await CreateSampleProductAsync("P3", 150);
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
 
-            var result = await _productRepository.getProducts(
-                position: 1,
-                skip: 10,
-                desc: null,
-                minPrice: null,
-                maxPrice: null,
-                categoryIds: Array.Empty<int?>(),
-                styleIds: Array.Empty<int?>());
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
 
-            Assert.Equal(3, result.TotalCount);
-            Assert.Contains(result.Items, p => p.ProductId == p1.ProductId);
-            Assert.Contains(result.Items, p => p.ProductId == p2.ProductId);
-            Assert.Contains(result.Items, p => p.ProductId == p3.ProductId);
-        }
-
-        [Fact]
-        public async Task GetProducts_ShouldFilterByCategory()
-        {
-            var cat1 = new Category { Name = "Cat1", Description = "Category 1" };
-            var cat2 = new Category { Name = "Cat2", Description = "Category 2" };
-            await _dbContext.Categories.AddRangeAsync(cat1, cat2);
-            await _dbContext.SaveChangesAsync();
-
-            var p1 = await CreateSampleProductAsync("P1", 50, cat1.CategoryId);
-            var p2 = await CreateSampleProductAsync("P2", 100, cat2.CategoryId);
-
-            var result = await _productRepository.getProducts(
-                position: 1,
-                skip: 10,
-                desc: null,
-                minPrice: null,
-                maxPrice: null,
-                categoryIds: new int?[] { cat1.CategoryId },
-                styleIds: Array.Empty<int?>());
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, "sofa", null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
-            Assert.Equal(p1.ProductId, result.Items.First().ProductId);
-            Assert.Equal(1, result.TotalCount);
+            Assert.Equal("Sofa", result.Items[0].Name);
         }
 
         [Fact]
-        public async Task GetProducts_ShouldFilterByPriceRange()
+        public async Task GetProducts_FiltersBy_MinPrice()
         {
-            var cheap = await CreateSampleProductAsync("Cheap", 50);
-            var expensive = await CreateSampleProductAsync("Expensive", 200);
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
 
-            var result = await _productRepository.getProducts(
-                position: 1,
-                skip: 10,
-                desc: null,
-                minPrice: 100,
-                maxPrice: 300,
-                categoryIds: Array.Empty<int?>(),
-                styleIds: Array.Empty<int?>());
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, 400, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
-            Assert.Equal(expensive.ProductId, result.Items.First().ProductId);
+            Assert.Equal("Sofa", result.Items[0].Name);
         }
 
         [Fact]
-        public async Task GetProducts_ShouldSupportPagination()
+        public async Task GetProducts_FiltersBy_MaxPrice()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                await CreateSampleProductAsync($"Product{i}", 50 + i * 10);
-            }
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
 
-            var result = await _productRepository.getProducts(
-                position: 2,
-                skip: 2,
-                desc: null,
-                minPrice: null,
-                maxPrice: null,
-                categoryIds: Array.Empty<int?>(),
-                styleIds: Array.Empty<int?>());
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, 200, Array.Empty<int?>(), Array.Empty<int?>());
+
+            Assert.Single(result.Items);
+            Assert.Equal("Chair", result.Items[0].Name);
+        }
+
+        [Fact]
+        public async Task GetProducts_FiltersBy_PriceRange()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            var product3 = new Product { Name = "Table", Price = 300, CategoryId = category.CategoryId, Description = "Dining table", Stock = 5, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2, product3);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, 200, 400, Array.Empty<int?>(), Array.Empty<int?>());
+
+            Assert.Single(result.Items);
+            Assert.Equal("Table", result.Items[0].Name);
+        }
+
+        [Fact]
+        public async Task GetProducts_FiltersBy_CategoryId()
+        {
+            var category1 = new Category { Name = "Furniture", Description = "Home furniture" };
+            var category2 = new Category { Name = "Decor", Description = "Home decor" };
+            _fixture.Context.Categories.AddRange(category1, category2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category1.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Vase", Price = 50, CategoryId = category2.CategoryId, Description = "Decorative vase", Stock = 30, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, null, new int?[] { category1.CategoryId }, Array.Empty<int?>());
+
+            Assert.Single(result.Items);
+            Assert.Equal("Sofa", result.Items[0].Name);
+        }
+
+        [Fact]
+        public async Task GetProducts_FiltersBy_StyleId()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var style1 = new Style { Name = "Modern", Description = "Modern style" };
+            var style2 = new Style { Name = "Classic", Description = "Classic style" };
+            _fixture.Context.Styles.AddRange(style1, style2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var productStyle1 = new ProductStyle { ProductId = product1.ProductId, StyleId = style1.StyleId };
+            var productStyle2 = new ProductStyle { ProductId = product2.ProductId, StyleId = style2.StyleId };
+            _fixture.Context.ProductStyles.AddRange(productStyle1, productStyle2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), new int?[] { style1.StyleId });
+
+            Assert.Single(result.Items);
+            Assert.Equal("Sofa", result.Items[0].Name);
+        }
+
+        [Fact]
+        public async Task GetProducts_Pagination_ReturnsCorrectPage()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var product = new Product { Name = $"Product{i}", Price = i * 100, CategoryId = category.CategoryId, Description = $"Product {i}", Stock = 10, IsActive = true };
+                _fixture.Context.Products.Add(product);
+            }
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(2, 2, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Equal(5, result.TotalCount);
             Assert.Equal(2, result.Items.Count);
+        }
+
+        [Fact]
+        public async Task GetProducts_OrdersByPrice()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Expensive", Price = 1000, CategoryId = category.CategoryId, Description = "Expensive item", Stock = 1, IsActive = true };
+            var product2 = new Product { Name = "Cheap", Price = 50, CategoryId = category.CategoryId, Description = "Cheap item", Stock = 100, IsActive = true };
+            var product3 = new Product { Name = "Medium", Price = 300, CategoryId = category.CategoryId, Description = "Medium item", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2, product3);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+
+            Assert.Equal(3, result.Items.Count);
+            Assert.Equal("Cheap", result.Items[0].Name);
+            Assert.Equal("Medium", result.Items[1].Name);
+            Assert.Equal("Expensive", result.Items[2].Name);
+        }
+
+        [Fact]
+        public async Task AddNewProduct_AddsProductSuccessfully()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var newProduct = new Product 
+            { 
+                Name = "New Product", 
+                Price = 250, 
+                CategoryId = category.CategoryId, 
+                Description = "New product description", 
+                Stock = 15, 
+                IsActive = true,
+                FrontImageUrl = "front.jpg",
+                BackImageUrl = "back.jpg"
+            };
+
+            var result = await repository.AddNewProduct(newProduct);
+
+            Assert.NotNull(result);
+            Assert.True(result.ProductId > 0);
+            Assert.Equal("New Product", result.Name);
+            Assert.Equal(250, result.Price);
+        }
+
+        [Fact]
+        public async Task GetProducts_IncludesCategory()
+        {
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            _fixture.Context.Products.Add(product);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+
+            Assert.Single(result.Items);
+            Assert.NotNull(result.Items[0].Category);
+            Assert.Equal("Furniture", result.Items[0].Category.Name);
+        }
+
+        [Fact]
+        public async Task GetProducts_ReturnsEmpty_WhenNoProductsMatchFilters()
+        {
+            var repository = new ProductRepository(_fixture.Context);
+            var result = await repository.getProducts(1, 10, "nonexistent", null, null, Array.Empty<int?>(), Array.Empty<int?>());
+
+            Assert.Empty(result.Items);
+            Assert.Equal(0, result.TotalCount);
         }
     }
 }

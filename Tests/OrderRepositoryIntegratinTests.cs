@@ -1,116 +1,246 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Repository;
-using Test;
+using Repository.Models;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Tests
+namespace Test
 {
-    [Collection("Database Collection")]
-    public class OrderRepositoryIntegrationTests : IClassFixture<DatabaseFixture>, IDisposable
+    public class OrderRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
     {
-        private readonly myDBContext _dbContext;
         private readonly DatabaseFixture _fixture;
-        private readonly OrderRepository _orderRepository;
 
-        public OrderRepositoryIntegrationTests(DatabaseFixture databaseFixture)
+        public OrderRepositoryIntegrationTests(DatabaseFixture fixture)
         {
-            _fixture = databaseFixture;
-            _dbContext = _fixture.Context;
-            _orderRepository = new OrderRepository(_dbContext);
+            _fixture = fixture;
             _fixture.ClearDatabase();
         }
 
-        public void Dispose() => _fixture.ClearDatabase();
-
-        private async Task<Order> CreateSampleOrderAsync(string email = "order@test.com")
-        {
-            var user = new User { Email = email, PasswordHash = "123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-            var category = new Category { Name = "General", Description = "General category" };
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.Categories.AddAsync(category);
-            await _dbContext.SaveChangesAsync();
-
-            var product = new Product { Name = "Item", CategoryId = category.CategoryId, Price = 100, Stock = 10, IsActive = true };
-            await _dbContext.Products.AddAsync(product);
-            await _dbContext.SaveChangesAsync();
-
-            return new Order
-            {
-                UserId = user.UserId,
-                OrderDate = DateTime.Now,
-                TotalPrice = 100,
-                Status = "Pending",
-                OrderItems = new List<OrderItem>
-                {
-                    new OrderItem { ProductId = product.ProductId, Quantity = 1 }
-                }
-            };
-        }
-
         [Fact]
-        public async Task AddNewOrder_ShouldAddOrder_WithValidData()
+        public async Task GetOrderById_ReturnsOrder_WithOrderItems()
         {
-            var order = await CreateSampleOrderAsync("valid@order.com");
-            var result = await _orderRepository.AddNewOrder(order);
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            _fixture.Context.Products.Add(product);
+            await _fixture.Context.SaveChangesAsync();
+
+            var order = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Pending", TotalPrice = 500 };
+            _fixture.Context.Orders.Add(order);
+            await _fixture.Context.SaveChangesAsync();
+
+            var orderItem = new OrderItem { OrderId = order.OrderId, ProductId = product.ProductId, Quantity = 1, PriceAtPurchase = 500 };
+            _fixture.Context.OrderItems.Add(orderItem);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var result = await repository.GetOrderById(order.OrderId);
+
             Assert.NotNull(result);
-            Assert.True(result.OrderId > 0);
+            Assert.Equal(order.OrderId, result.OrderId);
+            Assert.Single(result.OrderItems);
+            Assert.Equal(product.ProductId, result.OrderItems.First().ProductId);
         }
 
         [Fact]
-        public async Task GetOrderById_ShouldReturnOrder_WhenExists()
+        public async Task GetOrderById_ReturnsNull_WhenOrderNotFound()
         {
-            var order = await CreateSampleOrderAsync("get@order.com");
-            var added = await _orderRepository.AddNewOrder(order);
-            var result = await _orderRepository.GetOrderById(added.OrderId);
-            Assert.NotNull(result);
-            Assert.Equal(added.OrderId, result.OrderId);
-        }
+            var repository = new OrderRepository(_fixture.Context);
+            var result = await repository.GetOrderById(999);
 
-        [Fact]
-        public async Task GetOrderById_ShouldReturnNull_WhenNotExists()
-        {
-            var result = await _orderRepository.GetOrderById(9999);
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task AddNewOrder_ShouldHandleMultipleItems()
+        public async Task AddNewOrder_AddsOrderSuccessfully()
         {
-            var order = await CreateSampleOrderAsync("multi@order.com");
-            var firstProductId = order.OrderItems.First().ProductId;
-            order.OrderItems.Add(new OrderItem { ProductId = firstProductId, Quantity = 5 });
-            var result = await _orderRepository.AddNewOrder(order);
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var newOrder = new Order 
+            { 
+                UserId = user.UserId, 
+                OrderDate = DateTime.Now, 
+                Status = "Pending", 
+                TotalPrice = 500 
+            };
+
+            var result = await repository.AddNewOrder(newOrder);
+
+            Assert.NotNull(result);
+            Assert.True(result.OrderId > 0);
+            Assert.Equal("Pending", result.Status);
+            Assert.Equal(500, result.TotalPrice);
+        }
+
+        [Fact]
+        public async Task AddNewOrder_WithOrderItems_AddsSuccessfully()
+        {
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var newOrder = new Order 
+            { 
+                UserId = user.UserId, 
+                OrderDate = DateTime.Now, 
+                Status = "Pending", 
+                TotalPrice = 600,
+                OrderItems = new List<OrderItem>
+                {
+                    new OrderItem { ProductId = product1.ProductId, Quantity = 1, PriceAtPurchase = 500 },
+                    new OrderItem { ProductId = product2.ProductId, Quantity = 1, PriceAtPurchase = 100 }
+                }
+            };
+
+            var result = await repository.AddNewOrder(newOrder);
+
+            Assert.NotNull(result);
+            Assert.True(result.OrderId > 0);
             Assert.Equal(2, result.OrderItems.Count);
         }
 
         [Fact]
-        public async Task AddNewOrder_ShouldFail_WhenUserDoesNotExist()
+        public async Task GetOrderById_IncludesProductDetails()
         {
-            var order = await CreateSampleOrderAsync("fail@order.com");
-            order.UserId = 9999; // משתמש לא קיים
-            await Assert.ThrowsAsync<DbUpdateException>(async () => await _orderRepository.AddNewOrder(order));
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            _fixture.Context.Products.Add(product);
+            await _fixture.Context.SaveChangesAsync();
+
+            var order = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Pending", TotalPrice = 500 };
+            _fixture.Context.Orders.Add(order);
+            await _fixture.Context.SaveChangesAsync();
+
+            var orderItem = new OrderItem { OrderId = order.OrderId, ProductId = product.ProductId, Quantity = 1, PriceAtPurchase = 500 };
+            _fixture.Context.OrderItems.Add(orderItem);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var result = await repository.GetOrderById(order.OrderId);
+
+            Assert.NotNull(result);
+            Assert.NotNull(result.OrderItems.First().Product);
+            Assert.Equal("Sofa", result.OrderItems.First().Product.Name);
         }
 
         [Fact]
-        public async Task GetOrderById_ShouldIncludeOrderItems()
+        public async Task AddNewOrder_WithMultipleQuantities_AddsSuccessfully()
         {
-            var order = await CreateSampleOrderAsync("include@order.com");
-            var added = await _orderRepository.AddNewOrder(order);
-            var result = await _orderRepository.GetOrderById(added.OrderId);
-            Assert.NotEmpty(result.OrderItems);
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            _fixture.Context.Products.Add(product);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var newOrder = new Order 
+            { 
+                UserId = user.UserId, 
+                OrderDate = DateTime.Now, 
+                Status = "Pending", 
+                TotalPrice = 500,
+                OrderItems = new List<OrderItem>
+                {
+                    new OrderItem { ProductId = product.ProductId, Quantity = 5, PriceAtPurchase = 100 }
+                }
+            };
+
+            var result = await repository.AddNewOrder(newOrder);
+
+            Assert.NotNull(result);
+            Assert.Single(result.OrderItems);
+            Assert.Equal(5, result.OrderItems.First().Quantity);
         }
 
         [Fact]
-        public async Task AddNewOrder_ShouldCalculateSumCorrectly()
+        public async Task GetOrderById_WithMultipleOrderItems_ReturnsAll()
         {
-            var order = await CreateSampleOrderAsync("sum@order.com");
-            order.TotalPrice = 550;
-            var result = await _orderRepository.AddNewOrder(order);
-            Assert.Equal(550, result.TotalPrice);
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var category = new Category { Name = "Furniture", Description = "Home furniture" };
+            _fixture.Context.Categories.Add(category);
+            await _fixture.Context.SaveChangesAsync();
+
+            var product1 = new Product { Name = "Sofa", Price = 500, CategoryId = category.CategoryId, Description = "Comfortable sofa", Stock = 10, IsActive = true };
+            var product2 = new Product { Name = "Chair", Price = 100, CategoryId = category.CategoryId, Description = "Wooden chair", Stock = 20, IsActive = true };
+            var product3 = new Product { Name = "Table", Price = 300, CategoryId = category.CategoryId, Description = "Dining table", Stock = 5, IsActive = true };
+            _fixture.Context.Products.AddRange(product1, product2, product3);
+            await _fixture.Context.SaveChangesAsync();
+
+            var order = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Pending", TotalPrice = 900 };
+            _fixture.Context.Orders.Add(order);
+            await _fixture.Context.SaveChangesAsync();
+
+            var orderItem1 = new OrderItem { OrderId = order.OrderId, ProductId = product1.ProductId, Quantity = 1, PriceAtPurchase = 500 };
+            var orderItem2 = new OrderItem { OrderId = order.OrderId, ProductId = product2.ProductId, Quantity = 1, PriceAtPurchase = 100 };
+            var orderItem3 = new OrderItem { OrderId = order.OrderId, ProductId = product3.ProductId, Quantity = 1, PriceAtPurchase = 300 };
+            _fixture.Context.OrderItems.AddRange(orderItem1, orderItem2, orderItem3);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            var result = await repository.GetOrderById(order.OrderId);
+
+            Assert.NotNull(result);
+            Assert.Equal(3, result.OrderItems.Count);
+            Assert.Equal(900, result.TotalPrice);
+        }
+
+        [Fact]
+        public async Task AddNewOrder_WithDifferentStatuses_AddsSuccessfully()
+        {
+            var user = new User { Email = "user@test.com", PasswordHash = "hash", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new OrderRepository(_fixture.Context);
+            
+            var order1 = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Pending", TotalPrice = 100 };
+            var order2 = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Completed", TotalPrice = 200 };
+            var order3 = new Order { UserId = user.UserId, OrderDate = DateTime.Now, Status = "Cancelled", TotalPrice = 300 };
+
+            await repository.AddNewOrder(order1);
+            await repository.AddNewOrder(order2);
+            await repository.AddNewOrder(order3);
+
+            var result1 = await repository.GetOrderById(order1.OrderId);
+            var result2 = await repository.GetOrderById(order2.OrderId);
+            var result3 = await repository.GetOrderById(order3.OrderId);
+
+            Assert.Equal("Pending", result1.Status);
+            Assert.Equal("Completed", result2.Status);
+            Assert.Equal("Cancelled", result3.Status);
         }
     }
 }

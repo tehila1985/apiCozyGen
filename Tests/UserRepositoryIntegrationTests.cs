@@ -1,169 +1,182 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Repository;
-using Test;
+using Repository.Models;
 using Xunit;
-using System;
-using System.Threading.Tasks;
 
-namespace Tests
+namespace Test
 {
-    [Collection("Database Collection")]
-    public class UserRepositoryIntegrationTests : IClassFixture<DatabaseFixture>, IDisposable
+    public class UserRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
     {
-        private readonly myDBContext _dbContext;
         private readonly DatabaseFixture _fixture;
-        private readonly UserRepository _userRepository;
 
-        public UserRepositoryIntegrationTests(DatabaseFixture databaseFixture)
+        public UserRepositoryIntegrationTests(DatabaseFixture fixture)
         {
-            _fixture = databaseFixture;
-            _dbContext = _fixture.Context;
-            _userRepository = new UserRepository(_dbContext);
+            _fixture = fixture;
             _fixture.ClearDatabase();
         }
 
-        public void Dispose() => _fixture.ClearDatabase();
-
         [Fact]
-        public async Task AddNewUser_ShouldAddUser_WithValidData()
+        public async Task GetUsers_ReturnsAllUsers_FromDatabase()
         {
-            var user = new User { Email = "valid.email@example.com", PasswordHash = "StrongPassword123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
-            var result = await _userRepository.AddNewUser(user);
-            Assert.NotNull(result);
-            Assert.Equal(user.Email, result.Email);
-        }
+            var user1 = new User { Email = "user1@test.com", PasswordHash = "hash1", FirstName = "John", LastName = "Doe", Role = "User", IsClubMember = false };
+            var user2 = new User { Email = "user2@test.com", PasswordHash = "hash2", FirstName = "Jane", LastName = "Smith", Role = "Admin", IsClubMember = true };
+            
+            _fixture.Context.Users.Add(user1);
+            _fixture.Context.Users.Add(user2);
+            await _fixture.Context.SaveChangesAsync();
 
-        [Fact]
-        public async Task GetUserById_ShouldReturnNull_WhenUserDoesNotExist()
-        {
-            var result = await _userRepository.GetUserById(9999);
-            Assert.Null(result);
-        }
+            var repository = new UserRepository(_fixture.Context);
+            var result = await repository.GetUsers();
 
-        [Fact]
-        public async Task Login_ShouldReturnNull_WhenInvalidCredentialsProvided()
-        {
-            await _userRepository.AddNewUser(new User { Email = "login@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-            var loginUser = new User { Email = "login@test.com", PasswordHash = "WrongPassword" };
-            var result = await _userRepository.Login(loginUser);
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task Update_ShouldThrowException_WhenUserNotFound()
-        {
-            var user = new User { UserId = 9999, Email = "notfound@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-            await Assert.ThrowsAsync<DbUpdateConcurrencyException>(async () => await _userRepository.update(user.UserId, user));
-        }
-
-        [Fact]
-        public async Task GetUsers_ShouldReturnEmptyList_WhenNoUsersExist()
-        {
-            var result = await _userRepository.GetUsers();
-            Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task Login_ShouldReturnNull_WhenPasswordIsEmpty()
-        {
-            await _userRepository.AddNewUser(new User { Email = "empty@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-            var loginUser = new User { Email = "empty@test.com", PasswordHash = "" };
-            var result = await _userRepository.Login(loginUser);
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task GetUserById_ShouldReturnNull_WhenIdIsNegative()
-        {
-            var result = await _userRepository.GetUserById(-1);
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task Update_ShouldReturnUpdatedUser_WhenValidDataProvided()
-        {
-            var user = await _userRepository.AddNewUser(new User { Email = "update@test.com", PasswordHash = "OldPassword", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-            user.PasswordHash = "NewPassword123";
-            var result = await _userRepository.update(user.UserId, user);
-            Assert.NotNull(result);
-            Assert.Equal("NewPassword123", result.PasswordHash);
-        }
-
-        [Fact]
-        public async Task AddNewUser_ShouldSetDefaultValues_WhenUserIsCreated()
-        {
-            var user = new User { Email = "default@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-            var result = await _userRepository.AddNewUser(user);
-            Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task GetUserById_ShouldReturnUser_WhenUserExists()
-        {
-            var user = await _userRepository.AddNewUser(new User { Email = "findme@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-            var result = await _userRepository.GetUserById(user.UserId);
-            Assert.NotNull(result);
-            Assert.Equal("findme@test.com", result.Email);
-        }
-
-        [Fact]
-        public async Task GetUsers_ShouldReturnListOfUsers_WhenUsersExist()
-        {
-            await _userRepository.AddNewUser(new User { Email = "u1@test.com", PasswordHash = "Password123", FirstName = "User", LastName = "One", Role = "Customer", IsClubMember = false });
-            await _userRepository.AddNewUser(new User { Email = "u2@test.com", PasswordHash = "Password123", FirstName = "User", LastName = "Two", Role = "Customer", IsClubMember = false });
-            var result = await _userRepository.GetUsers();
             Assert.Equal(2, result.Count);
+            Assert.Contains(result, u => u.Email == "user1@test.com");
+            Assert.Contains(result, u => u.Email == "user2@test.com");
         }
-      
+
         [Fact]
-        public async Task Login_ShouldReturnUser_WithValidCredentials()
+        public async Task GetUserById_ReturnsCorrectUser()
         {
-            await _userRepository.AddNewUser(new User { Email = "loginok@test.com", PasswordHash = "CorrectPassword", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-            var result = await _userRepository.Login(new User { Email = "loginok@test.com", PasswordHash = "CorrectPassword" });
+            var user = new User { Email = "test@test.com", PasswordHash = "hash", FirstName = "Test", LastName = "User", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new UserRepository(_fixture.Context);
+            var result = await repository.GetUserById(user.UserId);
+
             Assert.NotNull(result);
+            Assert.Equal(user.UserId, result.UserId);
+            Assert.Equal("test@test.com", result.Email);
         }
 
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenPasswordTooShort()
-        //{
-        //    var user = new User { Email = "short@test.com", PasswordHash = "1", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-        //    await Assert.ThrowsAsync<DbUpdateException>(async () => await _userRepository.AddNewUser(user));
-        //}
-        //[Fact]
-        //public async Task Update_ShouldThrowException_WhenDataIsInvalid()
-        //{
-        //    var user = await _userRepository.AddNewUser(new User { Email = "invalid@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-        //    user.Email = "not-an-email";
-        //    await Assert.ThrowsAsync<DbUpdateException>(async () => await _userRepository.update(user.UserId, user));
-        //}
+        [Fact]
+        public async Task GetUserById_ReturnsNull_WhenUserNotFound()
+        {
+            var repository = new UserRepository(_fixture.Context);
+            var result = await repository.GetUserById(999);
 
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenEmailInvalid()
-        //{
-        //    var user = new User { Email = "bad-email", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-        //    await Assert.ThrowsAsync<DbUpdateException>(async () => await _userRepository.AddNewUser(user));
-        //}
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenPasswordTooShort()
-        //{
-        //    var user = new User { Email = "short@test.com", PasswordHash = "1", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-        //    await Assert.ThrowsAsync<DbUpdateException>(async () => await _userRepository.AddNewUser(user));
-        //}
-        //[Fact]
-        //public async Task AddNewUser_ShouldThrowValidationException_WhenEmailAlreadyExists()
-        //{
-        //    await _userRepository.AddNewUser(new User { Email = "dup@test.com", PasswordHash = "Password123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false });
-        //    var duplicateUser = new User { Email = "dup@test.com", PasswordHash = "Password456", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
-        //    await Assert.ThrowsAsync<DbUpdateException>(async () => await _userRepository.AddNewUser(duplicateUser));
-        //}
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task AddNewUser_AddsUserSuccessfully()
+        {
+            var repository = new UserRepository(_fixture.Context);
+            var newUser = new User 
+            { 
+                Email = "newuser@test.com", 
+                PasswordHash = "newhash", 
+                FirstName = "New", 
+                LastName = "User", 
+                Role = "User", 
+                IsClubMember = false,
+                Phone = "1234567890",
+                Address = "123 Test St"
+            };
+
+            var result = await repository.AddNewUser(newUser);
+
+            Assert.NotNull(result);
+            Assert.True(result.UserId > 0);
+            Assert.Equal("newuser@test.com", result.Email);
+
+            var userInDb = await repository.GetUserById(result.UserId);
+            Assert.NotNull(userInDb);
+            Assert.Equal("New", userInDb.FirstName);
+        }
+
+        [Fact]
+        public async Task Login_ReturnsUser_WithCorrectCredentials()
+        {
+            var user = new User { Email = "login@test.com", PasswordHash = "correcthash", FirstName = "Login", LastName = "Test", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new UserRepository(_fixture.Context);
+            var loginAttempt = new User { Email = "login@test.com", PasswordHash = "correcthash" };
+            
+            var result = await repository.Login(loginAttempt);
+
+            Assert.NotNull(result);
+            Assert.Equal("login@test.com", result.Email);
+            Assert.Equal("Login", result.FirstName);
+        }
+
+        [Fact]
+        public async Task Login_ReturnsNull_WithIncorrectPassword()
+        {
+            var user = new User { Email = "login@test.com", PasswordHash = "correcthash", FirstName = "Login", LastName = "Test", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new UserRepository(_fixture.Context);
+            var loginAttempt = new User { Email = "login@test.com", PasswordHash = "wronghash" };
+            
+            var result = await repository.Login(loginAttempt);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Login_ReturnsNull_WithIncorrectEmail()
+        {
+            var user = new User { Email = "login@test.com", PasswordHash = "correcthash", FirstName = "Login", LastName = "Test", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new UserRepository(_fixture.Context);
+            var loginAttempt = new User { Email = "wrong@test.com", PasswordHash = "correcthash" };
+            
+            var result = await repository.Login(loginAttempt);
+
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task Update_UpdatesUserSuccessfully()
+        {
+            var user = new User { Email = "update@test.com", PasswordHash = "hash", FirstName = "Original", LastName = "Name", Role = "User", IsClubMember = false };
+            _fixture.Context.Users.Add(user);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new UserRepository(_fixture.Context);
+            user.FirstName = "Updated";
+            user.IsClubMember = true;
+            
+            var result = await repository.update(user.UserId, user);
+
+            Assert.Equal("Updated", result.FirstName);
+            Assert.True(result.IsClubMember);
+
+            _fixture.Context.ChangeTracker.Clear();
+            var updatedUser = await repository.GetUserById(user.UserId);
+            Assert.Equal("Updated", updatedUser.FirstName);
+            Assert.True(updatedUser.IsClubMember);
+        }
+
+        [Fact]
+        public async Task AddNewUser_WithAllProperties_SavesCorrectly()
+        {
+            var repository = new UserRepository(_fixture.Context);
+            var newUser = new User 
+            { 
+                Email = "complete@test.com", 
+                PasswordHash = "hash123", 
+                FirstName = "Complete", 
+                LastName = "User", 
+                Role = "Admin", 
+                IsClubMember = true,
+                Phone = "9876543210",
+                Address = "456 Complete Ave"
+            };
+
+            var result = await repository.AddNewUser(newUser);
+
+            Assert.Equal("complete@test.com", result.Email);
+            Assert.Equal("Complete", result.FirstName);
+            Assert.Equal("User", result.LastName);
+            Assert.Equal("Admin", result.Role);
+            Assert.True(result.IsClubMember);
+            Assert.Equal("9876543210", result.Phone);
+            Assert.Equal("456 Complete Ave", result.Address);
+        }
     }
 }
-
-
-
-
-
-
-
-

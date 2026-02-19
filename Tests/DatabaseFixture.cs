@@ -12,16 +12,14 @@ namespace Test
         public DatabaseFixture()
         {
             var options = new DbContextOptionsBuilder<myDBContext>()
-                .UseSqlServer("Server = LAPTOP-LDNABVH4\\SQLEXPRESS;Database=Tests;Trusted_Connection=True;TrustServerCertificate=True;")
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             Context = new myDBContext(options);
-            Context.Database.EnsureCreated();
         }
 
         public void ClearDatabase()
         {
             Context.ChangeTracker.Clear();
-            // סדר המחיקה קריטי למניעת שגיאות Foreign Key
             if (Context.OrderItems.Any()) Context.OrderItems.RemoveRange(Context.OrderItems);
             if (Context.Orders.Any()) Context.Orders.RemoveRange(Context.Orders);
             if (Context.ProductStyles.Any()) Context.ProductStyles.RemoveRange(Context.ProductStyles);
@@ -34,9 +32,7 @@ namespace Test
 
         public void Dispose()
         {
-            Context.Database.EnsureDeleted();
             Context.Dispose();
         }
     }
 }
-

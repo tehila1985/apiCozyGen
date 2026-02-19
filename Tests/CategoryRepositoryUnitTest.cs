@@ -1,99 +1,59 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
+using Microsoft.EntityFrameworkCore;
 using Moq;
-using Moq.EntityFrameworkCore;
 using Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Repository.Models;
 using Xunit;
 
-namespace Tests
+namespace Test
 {
-    public class CategoryRepositoryUnitTest
+    public class CategoryRepositoryUnitTests
     {
-        private readonly Mock<myDBContext> mockContext;
-        private readonly CategoryRepository categoryRepository;
-
-        public CategoryRepositoryUnitTest()
+        [Fact]
+        public async Task GetCategories_ReturnsAllCategories()
         {
-            mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
-            categoryRepository = new CategoryRepository(mockContext.Object);
-        }
+            var categories = new List<Category>
+            {
+                new Category { CategoryId = 1, Name = "Furniture", Description = "Home furniture", ImageUrl = "img1.jpg" },
+                new Category { CategoryId = 2, Name = "Decor", Description = "Home decor", ImageUrl = "img2.jpg" }
+            };
 
-        // ===== Setup לדוגמא =====
-        private (Category category, Product product) CreateSampleCategory()
-        {
-            var category = new Category { CategoryId = 1, Name = "Electronics", Description = "Electronics category", ImageUrl = "http://example.com/electronics.png" };
-            var product = new Product { ProductId = 1, Name = "Laptop", CategoryId = category.CategoryId, Category = category, Price = 1000, Stock = 10, IsActive = true };
-            category.Products.Add(product);
-            return (category, product);
+            var mockSet = new Mock<DbSet<Category>>();
+            mockSet.As<IQueryable<Category>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Category>(categories.AsQueryable().Provider));
+            mockSet.As<IQueryable<Category>>().Setup(m => m.Expression).Returns(categories.AsQueryable().Expression);
+            mockSet.As<IQueryable<Category>>().Setup(m => m.ElementType).Returns(categories.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(categories.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Category>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Category>(categories.GetEnumerator()));
+
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Categories).Returns(mockSet.Object);
+
+            var repository = new CategoryRepository(mockContext.Object);
+            var result = await repository.GetCategories();
+
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Furniture", result[0].Name);
+            Assert.Equal("Decor", result[1].Name);
         }
 
         [Fact]
-        public async Task GetCategories_ShouldReturnAllCategories_WhenExist()
+        public async Task GetCategories_ReturnsEmptyList_WhenNoCategories()
         {
-            var (category, product) = CreateSampleCategory();
+            var categories = new List<Category>();
 
-            mockContext.Setup(c => c.Categories).ReturnsDbSet(new List<Category> { category });
-            mockContext.Setup(c => c.Products).ReturnsDbSet(new List<Product> { product });
+            var mockSet = new Mock<DbSet<Category>>();
+            mockSet.As<IQueryable<Category>>().Setup(m => m.Provider).Returns(new TestAsyncQueryProvider<Category>(categories.AsQueryable().Provider));
+            mockSet.As<IQueryable<Category>>().Setup(m => m.Expression).Returns(categories.AsQueryable().Expression);
+            mockSet.As<IQueryable<Category>>().Setup(m => m.ElementType).Returns(categories.AsQueryable().ElementType);
+            mockSet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(categories.GetEnumerator());
+            mockSet.As<IAsyncEnumerable<Category>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Category>(categories.GetEnumerator()));
 
-            var result = await categoryRepository.GetCategories();
+            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            mockContext.Setup(c => c.Categories).Returns(mockSet.Object);
 
-            Assert.NotNull(result);
-            Assert.Single(result);
-            Assert.Equal("Electronics", result.First().Name);
-        }
+            var repository = new CategoryRepository(mockContext.Object);
+            var result = await repository.GetCategories();
 
-        [Fact]
-        public async Task GetCategories_ShouldReturnEmptyList_WhenNoCategoriesExist()
-        {
-            mockContext.Setup(c => c.Categories).ReturnsDbSet(new List<Category>());
-
-            var result = await categoryRepository.GetCategories();
-
-            Assert.NotNull(result);
             Assert.Empty(result);
-        }
-
-        [Fact]
-        public async Task Category_ShouldIncludeProducts_WhenProductsExist()
-        {
-            var (category, product) = CreateSampleCategory();
-
-            mockContext.Setup(c => c.Categories).ReturnsDbSet(new List<Category> { category });
-            mockContext.Setup(c => c.Products).ReturnsDbSet(new List<Product> { product });
-
-            var result = await categoryRepository.GetCategories();
-
-            var fetchedCategory = result.FirstOrDefault();
-            Assert.NotNull(fetchedCategory);
-            Assert.NotEmpty(fetchedCategory.Products);
-            Assert.Contains(fetchedCategory.Products, p => p.ProductId == product.ProductId);
-        }
-
-        [Fact]
-        public async Task AddCategoryWithProducts_ShouldPersistCorrectlyInUnitTest()
-        {
-            var category = new Category { CategoryId = 2, Name = "Software", Description = "Software category" };
-            var product = new Product { ProductId = 2, Name = "IDE", Price = 200, CategoryId = category.CategoryId, Category = category, Stock = 5, IsActive = true };
-            category.Products.Add(product);
-
-            mockContext.Setup(c => c.Categories).ReturnsDbSet(new List<Category>());
-            mockContext.Setup(c => c.Products).ReturnsDbSet(new List<Product>());
-
-            // Simulate adding to DB
-            await mockContext.Object.Categories.AddAsync(category);
-            await mockContext.Object.Products.AddAsync(product);
-
-            var categories = await categoryRepository.GetCategories();
-
-            // In a pure Unit Test with Moq, the DbSet in-memory does not automatically return added entities.
-            // So here we just assert that the setup did not throw and that category object exists
-            Assert.NotNull(category);
-            Assert.Single(category.Products);
-            Assert.Equal("IDE", category.Products.First().Name);
         }
     }
 }

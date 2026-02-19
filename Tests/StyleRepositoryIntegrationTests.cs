@@ -1,108 +1,155 @@
-using Microsoft.EntityFrameworkCore;
-using Repository.Models;
 using Repository;
-using Test;
+using Repository.Models;
 using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Tests
+namespace Test
 {
-    [Collection("Database Collection")]
-    public class StyleRepositoryIntegrationTests : IClassFixture<DatabaseFixture>, IDisposable
+    public class StyleRepositoryIntegrationTests : IClassFixture<DatabaseFixture>
     {
-        private readonly myDBContext _dbContext;
         private readonly DatabaseFixture _fixture;
-        private readonly StyleRepository _styleRepository;
 
-        public StyleRepositoryIntegrationTests(DatabaseFixture databaseFixture)
+        public StyleRepositoryIntegrationTests(DatabaseFixture fixture)
         {
-            _fixture = databaseFixture;
-            _dbContext = _fixture.Context;
-            _styleRepository = new StyleRepository(_dbContext);
+            _fixture = fixture;
             _fixture.ClearDatabase();
         }
 
-        public void Dispose() => _fixture.ClearDatabase();
-
-        private async Task<Style> CreateSampleStyleAsync(string name = "General", string description = "Test style")
+        [Fact]
+        public async Task GetStyles_ReturnsAllStyles_FromDatabase()
         {
-            var style = new Style
-            {
-                Name = name,
-                Description = description,
-                ImageUrl = "http://example.com/style.png"
-            };
-            await _dbContext.Styles.AddAsync(style);
-            await _dbContext.SaveChangesAsync();
-            return style;
+            var style1 = new Style { Name = "Modern", Description = "Modern style", ImageUrl = "modern.jpg" };
+            var style2 = new Style { Name = "Classic", Description = "Classic style", ImageUrl = "classic.jpg" };
+            
+            _fixture.Context.Styles.Add(style1);
+            _fixture.Context.Styles.Add(style2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, s => s.Name == "Modern");
+            Assert.Contains(result, s => s.Name == "Classic");
         }
 
         [Fact]
-        public async Task AddNewStyle_ShouldAddStyleSuccessfully()
+        public async Task GetStyles_ReturnsEmptyList_WhenNoStylesInDatabase()
         {
-            var style = new Style { Name = "Modern", Description = "Modern style", ImageUrl = "http://example.com/modern.png" };
-            await _dbContext.Styles.AddAsync(style);
-            await _dbContext.SaveChangesAsync();
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
 
-            var savedStyle = await _dbContext.Styles.FindAsync(style.StyleId);
-            Assert.NotNull(savedStyle);
-            Assert.Equal("Modern", savedStyle.Name);
-        }
-
-        [Fact]
-        public async Task GetStyles_ShouldReturnAllStyles_WhenExist()
-        {
-            var style1 = await CreateSampleStyleAsync("Classic", "Classic style");
-            var style2 = await CreateSampleStyleAsync("Minimalist", "Minimalist style");
-
-            var result = await _styleRepository.GetStyles();
-
-            Assert.NotNull(result);
-            Assert.True(result.Count >= 2);
-            Assert.Contains(result, s => s.StyleId == style1.StyleId);
-            Assert.Contains(result, s => s.StyleId == style2.StyleId);
-        }
-
-        [Fact]
-        public async Task GetStyles_ShouldReturnEmptyList_WhenNoStylesExist()
-        {
-            var result = await _styleRepository.GetStyles();
-
-            Assert.NotNull(result);
             Assert.Empty(result);
         }
 
         [Fact]
-        public async Task GetStyles_ShouldReturnStylesWithCorrectProperties()
+        public async Task GetStyles_ReturnsStyles_WithAllProperties()
         {
-            var style = await CreateSampleStyleAsync("Vintage", "Vintage style description");
+            var style = new Style 
+            { 
+                Name = "Minimalist", 
+                Description = "Minimalist design with clean lines", 
+                ImageUrl = "minimalist.jpg" 
+            };
+            
+            _fixture.Context.Styles.Add(style);
+            await _fixture.Context.SaveChangesAsync();
 
-            var styles = await _styleRepository.GetStyles();
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
 
-            var fetchedStyle = styles.Find(s => s.StyleId == style.StyleId);
-            Assert.NotNull(fetchedStyle);
-            Assert.Equal("Vintage", fetchedStyle.Name);
-            Assert.Equal("Vintage style description", fetchedStyle.Description);
-            Assert.Equal("http://example.com/style.png", fetchedStyle.ImageUrl);
+            Assert.Single(result);
+            Assert.Equal("Minimalist", result[0].Name);
+            Assert.Equal("Minimalist design with clean lines", result[0].Description);
+            Assert.Equal("minimalist.jpg", result[0].ImageUrl);
         }
 
         [Fact]
-        public async Task AddMultipleStyles_ShouldPersistCorrectly()
+        public async Task GetStyles_ReturnsMultipleStyles()
         {
-            var style1 = new Style { Name = "Industrial", Description = "Industrial style" };
-            var style2 = new Style { Name = "Bohemian", Description = "Bohemian style" };
+            var styles = new List<Style>
+            {
+                new Style { Name = "Modern", Description = "Modern style", ImageUrl = "modern.jpg" },
+                new Style { Name = "Classic", Description = "Classic style", ImageUrl = "classic.jpg" },
+                new Style { Name = "Rustic", Description = "Rustic style", ImageUrl = "rustic.jpg" },
+                new Style { Name = "Industrial", Description = "Industrial style", ImageUrl = "industrial.jpg" }
+            };
+            
+            _fixture.Context.Styles.AddRange(styles);
+            await _fixture.Context.SaveChangesAsync();
 
-            await _dbContext.Styles.AddRangeAsync(style1, style2);
-            await _dbContext.SaveChangesAsync();
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
 
-            var styles = await _styleRepository.GetStyles();
+            Assert.Equal(4, result.Count);
+            Assert.Contains(result, s => s.Name == "Modern");
+            Assert.Contains(result, s => s.Name == "Classic");
+            Assert.Contains(result, s => s.Name == "Rustic");
+            Assert.Contains(result, s => s.Name == "Industrial");
+        }
 
-            Assert.True(styles.Count >= 2);
-            Assert.Contains(styles, s => s.Name == "Industrial");
-            Assert.Contains(styles, s => s.Name == "Bohemian");
+        [Fact]
+        public async Task GetStyles_ReturnsStylesWithCorrectIds()
+        {
+            var style1 = new Style { Name = "Scandinavian", Description = "Scandinavian style", ImageUrl = "scandinavian.jpg" };
+            var style2 = new Style { Name = "Bohemian", Description = "Bohemian style", ImageUrl = "bohemian.jpg" };
+            
+            _fixture.Context.Styles.AddRange(style1, style2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
+
+            Assert.Equal(2, result.Count);
+            Assert.All(result, s => Assert.True(s.StyleId > 0));
+        }
+
+        [Fact]
+        public async Task GetStyles_AfterAddingNewStyle_ReturnsUpdatedList()
+        {
+            var style1 = new Style { Name = "Contemporary", Description = "Contemporary style", ImageUrl = "contemporary.jpg" };
+            _fixture.Context.Styles.Add(style1);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new StyleRepository(_fixture.Context);
+            var result1 = await repository.GetStyles();
+            Assert.Single(result1);
+
+            var style2 = new Style { Name = "Traditional", Description = "Traditional style", ImageUrl = "traditional.jpg" };
+            _fixture.Context.Styles.Add(style2);
+            await _fixture.Context.SaveChangesAsync();
+
+            var result2 = await repository.GetStyles();
+            Assert.Equal(2, result2.Count);
+        }
+
+        [Fact]
+        public async Task GetStyles_WithNullDescription_ReturnsCorrectly()
+        {
+            var style = new Style { Name = "Eclectic", Description = null, ImageUrl = "eclectic.jpg" };
+            _fixture.Context.Styles.Add(style);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
+
+            Assert.Single(result);
+            Assert.Equal("Eclectic", result[0].Name);
+            Assert.Null(result[0].Description);
+        }
+
+        [Fact]
+        public async Task GetStyles_WithNullImageUrl_ReturnsCorrectly()
+        {
+            var style = new Style { Name = "Coastal", Description = "Coastal style", ImageUrl = null };
+            _fixture.Context.Styles.Add(style);
+            await _fixture.Context.SaveChangesAsync();
+
+            var repository = new StyleRepository(_fixture.Context);
+            var result = await repository.GetStyles();
+
+            Assert.Single(result);
+            Assert.Equal("Coastal", result[0].Name);
+            Assert.Null(result[0].ImageUrl);
         }
     }
 }
