@@ -15,6 +15,7 @@ namespace Api.Middlware
             _next = next;
         }
 
+
         public async Task Invoke(HttpContext httpContext, IRatingService ratingService)
         {
             Rating rating = new Rating();
