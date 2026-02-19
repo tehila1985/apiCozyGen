@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model;
+using Repository.Models;
 using Repository;
 using Test;
 using Xunit;
@@ -34,7 +34,7 @@ namespace Tests
         {
             if (categoryId == null)
             {
-                var category = new Category { Name = "General" };
+                var category = new Category { Name = $"Category_{Guid.NewGuid()}", Description = "General category" };
                 await _dbContext.Categories.AddAsync(category);
                 await _dbContext.SaveChangesAsync();
                 categoryId = category.CategoryId;
@@ -43,10 +43,12 @@ namespace Tests
             var product = new Product
             {
                 Name = name,
-                CategoryId = categoryId,
+                CategoryId = categoryId.Value,
                 Price = price,
                 Description = "Test description",
-                ImageUrl = "http://example.com/image.png"
+                FrontImageUrl = "http://example.com/image.png",
+                Stock = 10,
+                IsActive = true
             };
 
             await _dbContext.Products.AddAsync(product);
@@ -68,7 +70,8 @@ namespace Tests
                 desc: null,
                 minPrice: null,
                 maxPrice: null,
-                categoryIds: Array.Empty<int?>());
+                categoryIds: Array.Empty<int?>(),
+                styleIds: Array.Empty<int?>());
 
             Assert.Equal(3, result.TotalCount);
             Assert.Contains(result.Items, p => p.ProductId == p1.ProductId);
@@ -79,8 +82,8 @@ namespace Tests
         [Fact]
         public async Task GetProducts_ShouldFilterByCategory()
         {
-            var cat1 = new Category { Name = "Cat1" };
-            var cat2 = new Category { Name = "Cat2" };
+            var cat1 = new Category { Name = "Cat1", Description = "Category 1" };
+            var cat2 = new Category { Name = "Cat2", Description = "Category 2" };
             await _dbContext.Categories.AddRangeAsync(cat1, cat2);
             await _dbContext.SaveChangesAsync();
 
@@ -93,7 +96,8 @@ namespace Tests
                 desc: null,
                 minPrice: null,
                 maxPrice: null,
-                categoryIds: new int?[] { cat1.CategoryId });
+                categoryIds: new int?[] { cat1.CategoryId },
+                styleIds: Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal(p1.ProductId, result.Items.First().ProductId);
@@ -112,7 +116,8 @@ namespace Tests
                 desc: null,
                 minPrice: 100,
                 maxPrice: 300,
-                categoryIds: Array.Empty<int?>());
+                categoryIds: Array.Empty<int?>(),
+                styleIds: Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal(expensive.ProductId, result.Items.First().ProductId);
@@ -132,7 +137,8 @@ namespace Tests
                 desc: null,
                 minPrice: null,
                 maxPrice: null,
-                categoryIds: Array.Empty<int?>());
+                categoryIds: Array.Empty<int?>(),
+                styleIds: Array.Empty<int?>());
 
             Assert.Equal(5, result.TotalCount);
             Assert.Equal(2, result.Items.Count);

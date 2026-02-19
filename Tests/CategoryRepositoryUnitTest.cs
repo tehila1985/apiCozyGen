@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model;
+using Repository.Models;
 using Moq;
 using Moq.EntityFrameworkCore;
 using Repository;
@@ -18,15 +18,15 @@ namespace Tests
 
         public CategoryRepositoryUnitTest()
         {
-            mockContext = new Mock<myDBContext>();
+            mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
             categoryRepository = new CategoryRepository(mockContext.Object);
         }
 
         // ===== Setup לדוגמא =====
         private (Category category, Product product) CreateSampleCategory()
         {
-            var category = new Category { CategoryId = 1, Name = "Electronics" };
-            var product = new Product { ProductId = 1, Name = "Laptop", CategoryId = category.CategoryId, Category = category, Price = 1000 };
+            var category = new Category { CategoryId = 1, Name = "Electronics", Description = "Electronics category", ImageUrl = "http://example.com/electronics.png" };
+            var product = new Product { ProductId = 1, Name = "Laptop", CategoryId = category.CategoryId, Category = category, Price = 1000, Stock = 10, IsActive = true };
             category.Products.Add(product);
             return (category, product);
         }
@@ -76,8 +76,8 @@ namespace Tests
         [Fact]
         public async Task AddCategoryWithProducts_ShouldPersistCorrectlyInUnitTest()
         {
-            var category = new Category { CategoryId = 2, Name = "Software" };
-            var product = new Product { ProductId = 2, Name = "IDE", Price = 200, CategoryId = category.CategoryId, Category = category };
+            var category = new Category { CategoryId = 2, Name = "Software", Description = "Software category" };
+            var product = new Product { ProductId = 2, Name = "IDE", Price = 200, CategoryId = category.CategoryId, Category = category, Stock = 5, IsActive = true };
             category.Products.Add(product);
 
             mockContext.Setup(c => c.Categories).ReturnsDbSet(new List<Category>());

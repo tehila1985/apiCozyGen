@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model;
+using Repository.Models;
 using Repository;
 using Test;
 using Xunit;
@@ -42,7 +42,9 @@ namespace Tests
                 CategoryId = category.CategoryId,
                 Price = price,
                 Description = "Test product",
-                ImageUrl = "http://example.com/product.png"
+                FrontImageUrl = "http://example.com/product.png",
+                Stock = 10,
+                IsActive = true
             };
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
@@ -103,8 +105,8 @@ namespace Tests
         [Fact]
         public async Task AddCategoryWithProducts_ShouldPersistCorrectly()
         {
-            var category = new Category { Name = "Software" };
-            var product = new Product { Name = "IDE", Price = 200, Category = category };
+            var category = new Category { Name = "Software", Description = "Software category" };
+            var product = new Product { Name = "IDE", Price = 200, Category = category, Stock = 5, IsActive = true };
             category.Products.Add(product);
 
             await _dbContext.Categories.AddAsync(category);

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model;
+using Repository.Models;
 using Moq;
 using Moq.EntityFrameworkCore;
 using Repository;
@@ -18,23 +18,25 @@ namespace Tests
 
         public OrderRepositoryUnitTests()
         {
-            mockContext = new Mock<myDBContext>();
+            mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
             orderRepository = new OrderRepository(mockContext.Object);
         }
 
         // ===== Setup לדוגמא =====
         private (User user, Category category, Product product, OrderItem orderItem, Order order) CreateSampleOrder()
         {
-            var user = new User { UserId = 1, Gmail = "user@example.com", Password = "Password123" };
-            var category = new Category { CategoryId = 1, Name = "Electronics" };
-            var product = new Product { ProductId = 1, Name = "Laptop", CategoryId = category.CategoryId, Category = category, Price = 1000 };
+            var user = new User { UserId = 1, Email = "user@example.com", PasswordHash = "Password123", FirstName = "John", LastName = "Doe", Role = "Customer", IsClubMember = false };
+            var category = new Category { CategoryId = 1, Name = "Electronics", Description = "Electronics category" };
+            var product = new Product { ProductId = 1, Name = "Laptop", CategoryId = category.CategoryId, Category = category, Price = 1000, Stock = 10, IsActive = true };
             var orderItem = new OrderItem { OrderItemId = 1, ProductId = product.ProductId, Product = product, Quantity = 2 };
             var order = new Order
             {
                 OrderId = 1,
                 UserId = user.UserId,
                 User = user,
-                Sum = orderItem.Quantity.Value * product.Price.Value,
+                TotalPrice = orderItem.Quantity * product.Price,
+                Status = "Pending",
+                OrderDate = DateTime.Now,
                 OrderItems = new List<OrderItem> { orderItem }
             };
             return (user, category, product, orderItem, order);
@@ -55,7 +57,7 @@ namespace Tests
             Assert.Equal(order.UserId, result.UserId);
             Assert.Single(result.OrderItems);
             Assert.Equal(orderItem.ProductId, result.OrderItems.First().ProductId);
-            Assert.Equal(2000, result.Sum);
+            Assert.Equal(2000, result.TotalPrice);
         }
 
         [Fact]
@@ -70,7 +72,7 @@ namespace Tests
             Assert.NotNull(result);
             Assert.Equal(order.OrderId, result.OrderId);
             Assert.Single(result.OrderItems);
-            Assert.Equal(order.Sum, result.Sum);
+            Assert.Equal(order.TotalPrice, result.TotalPrice);
         }
 
         [Fact]
@@ -87,7 +89,7 @@ namespace Tests
         public async Task AddNewOrder_ShouldHandleMultipleOrderItems()
         {
             var (user, category, product, _, _) = CreateSampleOrder();
-            var product2 = new Product { ProductId = 2, Name = "Mouse", CategoryId = category.CategoryId, Category = category, Price = 50 };
+            var product2 = new Product { ProductId = 2, Name = "Mouse", CategoryId = category.CategoryId, Category = category, Price = 50, Stock = 20, IsActive = true };
             var orderItem1 = new OrderItem { OrderItemId = 1, ProductId = product.ProductId, Product = product, Quantity = 2 };
             var orderItem2 = new OrderItem { OrderItemId = 2, ProductId = product2.ProductId, Product = product2, Quantity = 1 };
             var order = new Order
@@ -95,7 +97,9 @@ namespace Tests
                 OrderId = 1,
                 UserId = user.UserId,
                 User = user,
-                Sum = orderItem1.Quantity.Value * product.Price.Value + orderItem2.Quantity.Value * product2.Price.Value,
+                TotalPrice = orderItem1.Quantity * product.Price + orderItem2.Quantity * product2.Price,
+                Status = "Pending",
+                OrderDate = DateTime.Now,
                 OrderItems = new List<OrderItem> { orderItem1, orderItem2 }
             };
 
@@ -107,7 +111,7 @@ namespace Tests
 
             Assert.NotNull(result);
             Assert.Equal(2, result.OrderItems.Count);
-            Assert.Equal(2050, result.Sum);
+            Assert.Equal(2050, result.TotalPrice);
         }
 
         [Fact]

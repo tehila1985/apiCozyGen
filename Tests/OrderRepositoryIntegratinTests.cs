@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Model;
+using Repository.Models;
 using Repository;
 using Test;
 using Xunit;
@@ -28,21 +28,22 @@ namespace Tests
 
         private async Task<Order> CreateSampleOrderAsync(string email = "order@test.com")
         {
-            var user = new User { Gmail = email, Password = "123" };
-            var category = new Category { Name = "General" };
+            var user = new User { Email = email, PasswordHash = "123", FirstName = "Test", LastName = "User", Role = "Customer", IsClubMember = false };
+            var category = new Category { Name = "General", Description = "General category" };
             await _dbContext.Users.AddAsync(user);
             await _dbContext.Categories.AddAsync(category);
             await _dbContext.SaveChangesAsync();
 
-            var product = new Product { Name = "Item", CategoryId = category.CategoryId, Price = 100 };
+            var product = new Product { Name = "Item", CategoryId = category.CategoryId, Price = 100, Stock = 10, IsActive = true };
             await _dbContext.Products.AddAsync(product);
             await _dbContext.SaveChangesAsync();
 
             return new Order
             {
                 UserId = user.UserId,
-                Date = DateOnly.FromDateTime(DateTime.Now),
-                Sum = 100,
+                OrderDate = DateTime.Now,
+                TotalPrice = 100,
+                Status = "Pending",
                 OrderItems = new List<OrderItem>
                 {
                     new OrderItem { ProductId = product.ProductId, Quantity = 1 }
@@ -107,9 +108,9 @@ namespace Tests
         public async Task AddNewOrder_ShouldCalculateSumCorrectly()
         {
             var order = await CreateSampleOrderAsync("sum@order.com");
-            order.Sum = 550;
+            order.TotalPrice = 550;
             var result = await _orderRepository.AddNewOrder(order);
-            Assert.Equal(550, result.Sum);
+            Assert.Equal(550, result.TotalPrice);
         }
     }
 }
