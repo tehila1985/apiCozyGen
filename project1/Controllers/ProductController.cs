@@ -45,6 +45,21 @@ namespace Api.Controllers
             else
                 return BadRequest();
         }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<DtoProduct_Id_Name_Category_Price_Desc_Image>> Delete(int id)
+        {
+            DtoProduct_Id_Name_Category_Price_Desc_Image res = await _s.Delete(id);
+
+            if (res != null)
+            {
+                return Ok(res);
+            }
+            else
+            {
+                return NotFound($"Product with ID {id} not found");
+            }
+        }
+
     }
 }
 

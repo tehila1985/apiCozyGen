@@ -23,5 +23,31 @@ namespace Api.Controllers
     {
       return await _s.GetCategories();
     }
-  }
+        [HttpPost]
+        public async Task<ActionResult<DtoCategory_Name_Id>> Post([FromQuery] DtocategoryAll categoryDto)
+        {
+
+            DtoCategory_Name_Id res = await _s.AddNewCategory(categoryDto);
+            if (res != null)
+            {
+                return CreatedAtAction(nameof(Get), new { id = res.CategoryId }, res);
+            }
+            else
+                return BadRequest();
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<DtoCategory_Name_Id>> Delete(int id)
+        {
+            DtoCategory_Name_Id res = await _s.Delete(id);
+
+            if (res != null)
+            {
+                return Ok(res);
+            }
+            else
+            {
+                return NotFound($"Category with ID {id} not found");
+            }
+        }
+    }
 }

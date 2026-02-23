@@ -25,5 +25,19 @@ namespace Services
             var r = _mapper.Map<List<Style>, List<DtoSyle_id_name>>(u);
             return r;
         }
+        public async Task<DtoSyle_id_name>  AddNewStyle(DtoStyleAll newStyle)
+        {
+            var styleEntity = _mapper.Map<Style>(newStyle);
+
+            var savedStyle = await _r.AddNewStyle(styleEntity);
+            return _mapper.Map<DtoSyle_id_name>(savedStyle);
+
+        }
+        public async Task<DtoSyle_id_name> Delete(int id)
+        {
+            var savedstyle = await _r.Delete(id);
+            return _mapper.Map<DtoSyle_id_name>(savedstyle);
+
+        }
     }
 }

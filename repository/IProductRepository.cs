@@ -15,5 +15,8 @@ namespace Repository
            [FromQuery] int? maxPrice,
            [FromQuery] int?[] categoryIds,
            [FromQuery] int?[] styleIds);
+        Task<Product> Delete(int id);
+
   }
+
 }

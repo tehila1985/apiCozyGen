@@ -19,5 +19,29 @@ namespace Repository
         {
             return await dbContext.Styles.ToListAsync();
         }
+
+        public async Task<Style> AddNewStyle(Style style)
+        {
+
+            await dbContext.Styles.AddAsync(style);
+            await dbContext.SaveChangesAsync();
+            return style;
+        }
+        public async Task<Style> Delete(int id)
+        {
+            var style = await dbContext.Styles
+                .Include(p => p.ProductStyles)
+                .FirstOrDefaultAsync(p => p.StyleId == id);
+
+            if (style != null)
+            {
+                dbContext.ProductStyles.RemoveRange(style.ProductStyles);
+                dbContext.Styles.Remove(style);
+                await dbContext.SaveChangesAsync();
+            }
+            return style;
+        }
+
+
     }
 }

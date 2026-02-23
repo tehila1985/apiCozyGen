@@ -14,5 +14,8 @@ namespace Services
            [FromQuery] int? maxPrice,
            [FromQuery] int?[] categoryIds,
            [FromQuery] int?[] styleIds);
+        Task<DtoProduct_Id_Name_Category_Price_Desc_Image> Delete(int id);
+
     }
+
 }

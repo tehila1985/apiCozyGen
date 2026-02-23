@@ -19,9 +19,9 @@ namespace Api.Controllers
 
 
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<List<DtoOrder_Id_UserId_Date_Sum_OrderItems>>> GetByUser(int id )
+        public async Task<ActionResult<List<DtoOrder_Id_UserId_Date_Sum_OrderItems>>> GetByUser(int userId)
         {
-            var order = await _s.GetOrdersUser(id);
+            var order = await _s.GetOrdersUser(userId);
             if (order != null)
             {
                 return Ok(order);

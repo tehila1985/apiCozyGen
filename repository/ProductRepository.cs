@@ -57,9 +57,21 @@ namespace Repository
             await dbContext.SaveChangesAsync();
             return product;
         }
-        public void Delete(int id)
+        public async Task<Product> Delete(int id)
         {
+            var product = await dbContext.Products
+                .Include(p => p.ProductStyles)
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
+            if (product != null)
+            {
+                dbContext.ProductStyles.RemoveRange(product.ProductStyles);
+                dbContext.Products.Remove(product);
+                await dbContext.SaveChangesAsync();
+            }
+            return product;
         }
+
     }
 }

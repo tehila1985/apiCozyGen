@@ -47,5 +47,11 @@ namespace Services
             var savedProduct = await _r.AddNewProduct(productEntity);
             return _mapper.Map<DtoProduct_Id_Name_Category_Price_Desc_Image>(savedProduct);
         }
+        public async Task<DtoProduct_Id_Name_Category_Price_Desc_Image>  Delete(int id)
+        {
+            var savedProduct = await _r.Delete(id);
+            return _mapper.Map<DtoProduct_Id_Name_Category_Price_Desc_Image>(savedProduct);
+
+        }
     }
 }

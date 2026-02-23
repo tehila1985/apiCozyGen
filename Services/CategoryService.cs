@@ -4,6 +4,7 @@ using Repository;
 using Repository.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,5 +28,19 @@ namespace Services
             var r = _mapper.Map<List<Category>,List< DtoCategory_Name_Id>>(u);
             return r;
             }
-  }
+        public async Task<DtoCategory_Name_Id> AddNewCategory(DtocategoryAll newCategory)
+        {
+            var categoryEntity = _mapper.Map<Category>(newCategory);
+
+            var savedCategory = await _r.AddNewCategory(categoryEntity);
+            return _mapper.Map<DtoCategory_Name_Id>(savedCategory);
+
+        }
+        public async Task<DtoCategory_Name_Id> Delete(int id)
+        {
+            var savedCategory = await _r.Delete(id);
+            return _mapper.Map<DtoCategory_Name_Id>(savedCategory);
+
+        }
+    }
 }

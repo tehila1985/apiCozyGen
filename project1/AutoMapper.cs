@@ -14,11 +14,14 @@ namespace Api
             CreateMap<User, DtoUser_Name_Password_Gmail>().ReverseMap();
             CreateMap<User, DtoUser_Name_Gmail>().ReverseMap();
             CreateMap<Category, DtoCategory_Name_Id>().ReverseMap();
+            CreateMap<Category, DtocategoryAll>().ReverseMap();
+
+            CreateMap<Style, DtoStyleAll>().ReverseMap();
             CreateMap<DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds, Product>();
             //CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>().ForMember(dest => dest.Name,
             //                                              opts => opts.MapFrom(src => src.Category.Name));
             CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>()
-                           .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+                           .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name)).ReverseMap();
             CreateMap<Order, DtoOrder_Id_UserId_Date_Sum_OrderItems>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems)).ReverseMap();
             CreateMap<OrderItem, DtoOrderItem_Id_OrderId_ProductId_Quantity>()
