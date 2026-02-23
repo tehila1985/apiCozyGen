@@ -15,6 +15,17 @@ namespace Repository
         {
             this.dbContext = dbContext;
         }
+        public async  Task<List<Order>> GetOrdersUser(int id)
+        { 
+            return await  dbContext.Orders
+                     .Include(o => o.OrderItems)
+                     .ThenInclude(oi => oi.Product)
+                     .Where(o => o.UserId == id)
+                     .OrderByDescending(o => o.OrderDate)
+                     .ToListAsync();
+
+        }
+
         public async Task<Order?> GetOrderById(int id)
         {
             return await dbContext.Orders

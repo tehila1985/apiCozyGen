@@ -23,6 +23,9 @@ namespace Api
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems)).ReverseMap();
             CreateMap<OrderItem, DtoOrderItem_Id_OrderId_ProductId_Quantity>()
                  .ForMember(dest => dest.ItemName, opt => opt.MapFrom(src => src.Product.Name));
+            CreateMap<DtoOrderItem_Id_OrderId_ProductId_Quantity, OrderItem>()
+                 .ForMember(dest => dest.Product, opt => opt.Ignore())
+                 .ForMember(dest => dest.Order, opt => opt.Ignore());
         }
     }
 }
