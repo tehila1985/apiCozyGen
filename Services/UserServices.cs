@@ -75,7 +75,7 @@ namespace Services
         {
            
             var user = await _r.GetUserByIdAndPassword(id, password);
-            if (user != null && user.Role == "1")
+            if (user != null && user.Role == "Admin")
             {
                 return true;
             }
