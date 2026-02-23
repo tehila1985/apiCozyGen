@@ -1,53 +1,71 @@
 ﻿using Dto;
 using Microsoft.AspNetCore.Mvc;
 using Services;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using System.Collections.Generic;
 
 namespace Api.Controllers
 {
-  [Route("api/[controller]")]
-  [ApiController]
-  public class CategoryController : ControllerBase
-  {
-
-      ILogger<CategoryController> _logger;
-      ICategoryService _s;
-    public CategoryController(ICategoryService i, ILogger<CategoryController> logger){
-         _s = i;
-        _logger= logger;
-     }
-    // GET: api/<CategoryController>
-    [HttpGet]
-    public async Task<IEnumerable<DtoCategory_Name_Id>> Get()
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CategoryController : ControllerBase
     {
-      return await _s.GetCategories();
-    }
-        [HttpPost]
-        public async Task<ActionResult<DtoCategory_Name_Id>> Post([FromQuery] DtocategoryAll categoryDto)
+        private readonly ILogger<CategoryController> _logger;
+        private readonly ICategoryService _s;
+        private readonly IUserServices _userService; 
+
+        public CategoryController(ICategoryService i, ILogger<CategoryController> logger, IUserServices userService)
         {
+            _s = i;
+            _logger = logger;
+            _userService = userService;
+        }
+
+        // GET: api/<CategoryController>
+        [HttpGet]
+        public async Task<IEnumerable<DtoCategory_Name_Id>> Get()
+        {
+            return await _s.GetCategories();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<DtoCategory_Name_Id>> Post(
+            [FromBody] DtocategoryAll categoryDto, 
+            [FromHeader] int userId,
+            [FromHeader] string password)
+        {
+            bool isAdmin = await _userService.IsAdminById(userId, password);
+            if (!isAdmin)
+            {
+                return Forbid("גישה נדחתה: פעולה זו שמורה למנהלים בלבד");
+            }
 
             DtoCategory_Name_Id res = await _s.AddNewCategory(categoryDto);
             if (res != null)
             {
-                return CreatedAtAction(nameof(Get), new { id = res.CategoryId }, res);
+                return Ok(res);
             }
-            else
-                return BadRequest();
+            return BadRequest("נכשל בהוספת הקטגוריה");
         }
+
         [HttpDelete("{id}")]
-        public async Task<ActionResult<DtoCategory_Name_Id>> Delete(int id)
+        public async Task<ActionResult<DtoCategory_Name_Id>> Delete(
+            int id,
+            [FromHeader] int userId,
+            [FromHeader] string password)
         {
+            bool isAdmin = await _userService.IsAdminById(userId, password);
+            if (!isAdmin)
+            {
+                return Forbid("גישה נדחתה: מחיקת קטגוריה דורשת הרשאות מנהל");
+            }
+
             DtoCategory_Name_Id res = await _s.Delete(id);
 
             if (res != null)
             {
                 return Ok(res);
             }
-            else
-            {
-                return NotFound($"Category with ID {id} not found");
-            }
+            return NotFound($"Category with ID {id} not found");
         }
     }
 }

@@ -48,5 +48,10 @@ namespace Repository
         public void Delete(int id)
         {
         }
+        public async Task<User> GetUserByIdAndPassword(int id, string password)
+        {
+            return await dbContext.Users
+                 .FirstOrDefaultAsync(u => u.UserId == id && u.PasswordHash == password);
+        }
     }
 }

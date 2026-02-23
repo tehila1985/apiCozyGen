@@ -1,8 +1,9 @@
-﻿using System.Text.Json;
-using Repository;
-using AutoMapper;
+﻿using AutoMapper;
 using Dto;
+using Microsoft.EntityFrameworkCore;
+using Repository;
 using Repository.Models;
+using System.Text.Json;
 namespace Services
 {
 
@@ -86,6 +87,16 @@ namespace Services
             _r.Delete(id);
         }
         //k
+        public async Task<bool> IsAdminById(int id, string password)
+        {
+           
+            var user = await _r.GetUserByIdAndPassword(id, password);
+            if (user != null && user.Role == "1")
+            {
+                return true;
+            }
+            return false;
+        }
 
     }
 }
