@@ -84,11 +84,5 @@ namespace project1.Controllers
             else
                 return BadRequest();  
         }
-
-        // DELETE api/<users>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

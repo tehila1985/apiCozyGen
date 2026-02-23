@@ -45,9 +45,7 @@ namespace Repository
             await dbContext.SaveChangesAsync();
             return value;
         }
-        public void Delete(int id)
-        {
-        }
+        
         public async Task<User> GetUserByIdAndPassword(int id, string password)
         {
             return await dbContext.Users

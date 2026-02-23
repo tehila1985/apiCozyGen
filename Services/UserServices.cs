@@ -55,19 +55,7 @@ namespace Services
             var dtoUser = _mapper.Map<User, DtoUser_Id_Name>(u);
             return dtoUser;
         }
-        //public async Task<DtoUser_Id_Name> update(int id, DtoUser_Name_Password_Gmail user)
-        //{
-
-        //    int d = _passwordService.getStrengthByPassword(user.PasswordHash);
-        //    if (d >= 2)
-        //    {
-        //        var a = _mapper.Map<DtoUser_Name_Password_Gmail, User>(user);
-        //        var res = await _r.update(id, a);
-        //        var DtoUser = _mapper.Map<User, DtoUser_Id_Name>(res);
-        //        return DtoUser;
-        //    }
-        //    return null;
-        //}
+       
         public async Task<DtoUser_Id_Name> update(int id, DtoUser_Name_Password_Gmail userDto)
         {
            
@@ -82,11 +70,7 @@ namespace Services
 
             return _mapper.Map<User, DtoUser_Id_Name>(res);
         }
-        public void Delete(int id)
-        {
-            _r.Delete(id);
-        }
-        //k
+      
         public async Task<bool> IsAdminById(int id, string password)
         {
            
