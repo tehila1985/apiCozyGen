@@ -21,7 +21,8 @@ namespace Dto
         public string CategoryName { get; set; }
 
         [Range(0, int.MaxValue, ErrorMessage = "Price must be bigger than 0")]
-        public int? Price { get; set; } 
+        public int? Price { get; set; }
+        public int Stock { get; set; }
 
         public string Description { get; set; }
 
@@ -30,6 +31,8 @@ namespace Dto
 
         [StringLength(500)]
         public string BackImageUrl { get; set; }
+
+
 
         public virtual ICollection<DtoProductStyle> ProductStyles { get; set; } = new List<DtoProductStyle>();
 

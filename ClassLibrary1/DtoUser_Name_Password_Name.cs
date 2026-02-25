@@ -14,6 +14,11 @@ namespace Dto
 
         [Required(ErrorMessage = "Password is required")]
         public string PasswordHash { get; set; }
+        [StringLength(50)]
+        public string Phone { get; set; }
+
+        [StringLength(255)]
+        public string Address { get; set; }
     }
 }
 
