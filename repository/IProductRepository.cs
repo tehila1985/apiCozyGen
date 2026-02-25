@@ -16,7 +16,8 @@ namespace Repository
            [FromQuery] int?[] categoryIds,
            [FromQuery] int?[] styleIds);
         Task<Product> Delete(int id);
+        Task<Product> GetById(int id);
 
-  }
+    }
 
 }

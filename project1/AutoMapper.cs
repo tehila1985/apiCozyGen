@@ -7,6 +7,7 @@ namespace Api
     {
         public AutoMapper()
         {
+            CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>().ReverseMap();
             CreateMap<User, DtoUser_Gmail_Password>().ReverseMap();
             CreateMap<Style,DtoSyle_id_name>().ReverseMap();
             CreateMap<User, DtoUser_Id_Name>().ReverseMap();

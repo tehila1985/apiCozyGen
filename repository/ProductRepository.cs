@@ -50,6 +50,10 @@ namespace Repository
 
             return (products, total);
         }
+        public async Task<Product> GetById(int id)
+        {
+            return await dbContext.Products.FirstOrDefaultAsync(p => p.ProductId == id);
+        }
         public async Task<Product> AddNewProduct(Product product)
         {
 

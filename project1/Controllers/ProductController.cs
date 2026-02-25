@@ -75,5 +75,10 @@ namespace Api.Controllers
             }
             return NotFound($"Product with ID {id} not found");
         }
+        [HttpGet("{id}")]
+        public async Task<DtoProduct_Id_Name_Category_Price_Desc_Image> Get(int id)
+        {
+            return await _s.GetById(id);
+        }
     }
 }

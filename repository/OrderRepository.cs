@@ -37,6 +37,15 @@ namespace Repository
         }
         public async Task<Order> AddNewOrder(Order order)
         {
+            foreach (var orderItem in order.OrderItems)
+            { 
+                var product = await dbContext.Products.FindAsync(orderItem.ProductId);
+
+                if (product != null)
+                {
+                    product.Stock -= orderItem.Quantity;
+                }
+            }
             await dbContext.Orders.AddAsync(order);
             await dbContext.SaveChangesAsync();
             return order;
