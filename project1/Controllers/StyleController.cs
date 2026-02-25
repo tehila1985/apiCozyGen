@@ -66,5 +66,51 @@ namespace Api.Controllers
             }
             return NotFound($"Style with ID {id} not found");
         }
+
+        // ===== נוסף עבור העלאת תמונות למנהל - התחלה =====
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadStyleWithImage(
+            [FromHeader] int userId,
+            [FromHeader] string password)
+        {
+            try
+            {
+                var form = await Request.ReadFormAsync();
+                var image = form.Files["image"];
+
+                if (image == null)
+                    return BadRequest(new { message = "חובה להעלות תמונה" });
+
+                var name = form["name"].ToString();
+                var description = form["description"].ToString();
+
+                bool isAdmin = await _userService.IsAdminById(userId, password);
+                if (!isAdmin)
+                    return StatusCode(403, new { message = "אין הרשאות מנהל" });
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "styles");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}_{image.FileName}";
+                using (var stream = new FileStream(Path.Combine(uploadsFolder, fileName), FileMode.Create))
+                    await image.CopyToAsync(stream);
+
+                var styleDto = new DtoStyleAll
+                {
+                    Name = name,
+                    Description = description,
+                    ImageUrl = $"/uploads/styles/{fileName}"
+                };
+
+                var result = await _s.AddNewStyle(styleDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "שגיאה: {Message}", ex.Message);
+                return StatusCode(500, new { message = "שגיאה בהעלאת התמונה", error = ex.Message });
+            }
+        }
+        // ===== נוסף עבור העלאת תמונות למנהל - סוף =====
     }
 }

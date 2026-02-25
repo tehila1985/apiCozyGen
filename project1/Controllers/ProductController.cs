@@ -80,5 +80,66 @@ namespace Api.Controllers
         {
             return await _s.GetById(id);
         }
+
+        // ===== נוסף עבור העלאת תמונות למנהל - התחלה =====
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadProductWithImages(
+            [FromHeader] int userId,
+            [FromHeader] string password)
+        {
+            try
+            {
+                var form = await Request.ReadFormAsync();
+
+                var frontImage = form.Files["frontImage"];
+                var backImage = form.Files["backImage"];
+
+                if (frontImage == null || backImage == null)
+                    return BadRequest(new { message = "חובה להעלות שתי תמונות" });
+
+                var name = form["name"].ToString();
+                var description = form["description"].ToString();
+                var price = decimal.Parse(form["price"].ToString());
+                var categoryId = int.Parse(form["categoryId"].ToString());
+
+                bool isAdmin = await _userService.IsAdminById(userId, password);
+                if (!isAdmin)
+                    return StatusCode(403, new { message = "אין הרשאות מנהל" });
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var frontFileName = $"{Guid.NewGuid()}_{frontImage.FileName}";
+                var backFileName = $"{Guid.NewGuid()}_{backImage.FileName}";
+
+                using (var stream = new FileStream(Path.Combine(uploadsFolder, frontFileName), FileMode.Create))
+                    await frontImage.CopyToAsync(stream);
+
+                using (var stream = new FileStream(Path.Combine(uploadsFolder, backFileName), FileMode.Create))
+                    await backImage.CopyToAsync(stream);
+
+                var productDto = new DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds
+                {
+                    Name = name,
+                    Description = description,
+                    Price = price,
+                    Stock = 0,
+                    CategoryId = categoryId,
+                    IsActive = true,
+                    FrontImageUrl = $"/uploads/products/{frontFileName}",
+                    BackImageUrl = $"/uploads/products/{backFileName}",
+                    ProductStyles = new List<DtoSyle_id_name>()
+                };
+
+                var result = await _s.AddNewProduct(productDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "שגיאה: {Message}", ex.Message);
+                return StatusCode(500, new { message = "שגיאה בהעלאת התמונות", error = ex.Message });
+            }
+        }
+        // ===== נוסף עבור העלאת תמונות למנהל - סוף =====
     }
 }

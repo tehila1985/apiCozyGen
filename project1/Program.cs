@@ -28,7 +28,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddDbContext<myDBContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Tehila"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Rivka"));
 });
 
 builder.Services.AddControllers();
@@ -64,8 +64,9 @@ app.UseCors("AllowAngular");
 
 app.UseErrorHandling();
 
-app.UseRating();
+//app.UseRating();
 
+// ===== נוסף עבור העלאת תמונות למנהל - מאפשר גישה לקבצים סטטיים =====
 app.UseStaticFiles();
 
 app.UseAuthorization();
