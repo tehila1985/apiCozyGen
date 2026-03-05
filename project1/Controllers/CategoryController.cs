@@ -95,13 +95,11 @@ namespace Api.Controllers
                 var fileName = $"{Guid.NewGuid()}_{image.FileName}";
                 using (var stream = new FileStream(Path.Combine(uploadsFolder, fileName), FileMode.Create))
                     await image.CopyToAsync(stream);
-
-                var categoryDto = new DtocategoryAll
-                {
-                    Name = name,
-                    Description = description,
-                    ImageUrl = $"/uploads/categories/{fileName}"
-                };
+                var categoryDto = new DtocategoryAll(
+                     Name: name,
+                     Description: description,
+                     ImageUrl: $"/uploads/categories/{fileName}"
+                 );
 
                 var result = await _s.AddNewCategory(categoryDto);
                 return Ok(result);

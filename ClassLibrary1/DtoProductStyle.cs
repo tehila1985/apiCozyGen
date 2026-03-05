@@ -8,18 +8,19 @@ using System.Threading.Tasks;
 
 namespace Dto
 {
-    public class DtoProductStyle
-    {
-        [Key]
-        public int ProductStyleId { get; set; }
+    public record DtoProductStyle(
+    [property: Key] int ProductStyleId,
+    int ProductId,
+    int StyleId
+);
 
-        public int ProductId { get; set; }
-
-        public int StyleId { get; set; }
-    }
 }
-//public record DtoProductStyle(
-//      [property: Key] int ProductStyleId,
-//      int ProductId,
-//      int StyleId
-//  );
+//public class DtoProductStyle
+//{
+//    [Key]
+//    public int ProductStyleId { get; set; }
+
+//    public int ProductId { get; set; }
+
+//    public int StyleId { get; set; }
+//}

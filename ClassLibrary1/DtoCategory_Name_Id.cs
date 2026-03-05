@@ -9,11 +9,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dto
 {
-    public class DtoCategory_Name_Id
-    {
-        public int CategoryId { get; set; }
+    public record DtoCategory_Name_Id(int CategoryId, string Name);
+    //public class DtoCategory_Name_Id
+    //{
+    //    public int CategoryId { get; set; }
 
-        public string Name { get; set; }
-    }
+    //    public string Name { get; set; }
+    //}
 }
-// public record DtoCategory_Name_Id(int CategoryId, string Name);

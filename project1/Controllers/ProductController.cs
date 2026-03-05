@@ -118,18 +118,18 @@ namespace Api.Controllers
                 using (var stream = new FileStream(Path.Combine(uploadsFolder, backFileName), FileMode.Create))
                     await backImage.CopyToAsync(stream);
 
-                var productDto = new DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds
-                {
-                    Name = name,
-                    Description = description,
-                    Price = price,
-                    Stock = 0,
-                    CategoryId = categoryId,
-                    IsActive = true,
-                    FrontImageUrl = $"/uploads/products/{frontFileName}",
-                    BackImageUrl = $"/uploads/products/{backFileName}",
-                    ProductStyles = new List<DtoSyle_id_name>()
-                };
+                var productDto = new DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds(
+                
+                    Name : name,
+                    Description: description,
+                    Price: price,
+                    Stock: 0,
+                    CategoryId: categoryId,
+                    IsActive: true,
+                    FrontImageUrl: $"/uploads/products/{frontFileName}",
+                    BackImageUrl: $"/uploads/products/{backFileName}",
+                    ProductStyles: new List<DtoSyle_id_name>()
+               );
 
                 var result = await _s.AddNewProduct(productDto);
                 return Ok(result);

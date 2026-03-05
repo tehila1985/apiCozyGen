@@ -8,30 +8,29 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dto
 {
-    
-    public class DtoUser_Name_Gmail
-    {
-        public int UserId { get; set; }
-
-        [Required(ErrorMessage = "Gmail is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format.")]
-        public string Email { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public string Role { get; set; }
-    }
+    public record DtoUser_Name_Gmail(
+          int UserId,
+          [property: Required(ErrorMessage = "Gmail is required")]
+        [property: EmailAddress(ErrorMessage = "Invalid email format.")]
+        string Email,
+          string FirstName,
+          string LastName,
+          string Role
+      );
 
 }
 
+//public class DtoUser_Name_Gmail
+//{
+//    public int UserId { get; set; }
 
-//public record DtoUser_Name_Gmail(
-//    int UserId,
-//    [property: Required(ErrorMessage = "Gmail is required")]
-//    [property: EmailAddress(ErrorMessage = "Invalid email format.")]
-//    string Email,
-//    string FirstName,
-//    string LastName
-//);
+//    [Required(ErrorMessage = "Gmail is required")]
+//    [EmailAddress(ErrorMessage = "Invalid email format.")]
+//    public string Email { get; set; }
+
+//    public string FirstName { get; set; }
+
+//    public string LastName { get; set; }
+
+//    public string Role { get; set; }
+//}

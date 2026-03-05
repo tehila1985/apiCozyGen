@@ -10,13 +10,13 @@ namespace Api.Controllers
     {
         private readonly ILogger<StyleController> _logger;
         private readonly IStyleService _s;
-        private readonly IUserServices _userService; // הוספת שירות המשתמשים
+        private readonly IUserServices _userService;
 
         public StyleController(IStyleService i, ILogger<StyleController> logger, IUserServices userService)
         {
             _s = i;
             _logger = logger;
-            _userService = userService; // הזרקה בבנאי
+            _userService = userService; 
         }
 
         // GET: api/<StyleController>
@@ -95,12 +95,13 @@ namespace Api.Controllers
                 using (var stream = new FileStream(Path.Combine(uploadsFolder, fileName), FileMode.Create))
                     await image.CopyToAsync(stream);
 
-                var styleDto = new DtoStyleAll
-                {
-                    Name = name,
-                    Description = description,
-                    ImageUrl = $"/uploads/styles/{fileName}"
-                };
+                var styleDto = new DtoStyleAll(
+                
+                    Name: name,
+                    Description : description,
+                    ImageUrl : $"/uploads/styles/{fileName}"
+               
+                );
 
                 var result = await _s.AddNewStyle(styleDto);
                 return Ok(result);

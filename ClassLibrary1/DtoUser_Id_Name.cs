@@ -8,14 +8,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dto
 {
-    //public record DtoUser_Id_Name(string? UserId,string FirstName);
-
-    public class DtoUser_Id_Name
-    {
-        public string? UserId { get; set; }
-        public string FirstName { get; set; }
-        public string Role { get; set; }
-    }
-
-
+    public record DtoUser_Id_Name(
+    string? UserId,
+    string FirstName,
+    string Role
+);
 }
+
+
+//public class DtoUser_Id_Name
+//{
+//    public string? UserId { get; set; }
+//    public string FirstName { get; set; }
+//    public string Role { get; set; }
+//}

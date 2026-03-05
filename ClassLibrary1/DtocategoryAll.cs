@@ -8,19 +8,29 @@ using System.Threading.Tasks;
 
 namespace Dto
 {
-    public class DtocategoryAll
-    {
-
-        [Required]
-        [StringLength(150)]
-        public string Name { get; set; }
-
-        [StringLength(500)]
-        public string Description { get; set; }
-
-        [StringLength(500)]
-        public string ImageUrl { get; set; }
-
-
-    }
+    public record DtocategoryAll(
+        [property: Required]
+        [property: StringLength(150)]
+        string Name,
+        [property: StringLength(500)]
+        string Description,
+        [property: StringLength(500)]
+        string ImageUrl
+    );
 }
+
+//public class DtocategoryAll
+//{
+
+//    [Required]
+//    [StringLength(150)]
+//    public string Name { get; set; }
+
+//    [StringLength(500)]
+//    public string Description { get; set; }
+
+//    [StringLength(500)]
+//    public string ImageUrl { get; set; }
+
+
+//}

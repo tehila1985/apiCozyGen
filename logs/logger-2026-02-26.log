@@ -1,0 +1,1 @@
+2026-02-26 02:03:02.7289|0|INFO|project1.Controllers.Userscontroller|login attempted with user name,rrrrr@gmai.com and password rivka1234561 |url: https://localhost/api/Users/Login|action: Login|project1.Controllers.Userscontroller.Login| body: 
