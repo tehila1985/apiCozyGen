@@ -10,31 +10,16 @@ using System.Threading.Tasks;
 namespace Dto
 {
     public record DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds(
-     [property: Required]
-    [property: StringLength(200)]
-    string Name,
-
-     [property: StringLength(1000)]
-    string Description,
-
-     [property: Column(TypeName = "decimal(10, 2)")]
-    decimal Price,
-
-     [property: StringLength(500)]
-    string FrontImageUrl,
-
-     [property: StringLength(500)]
-    string BackImageUrl,
-      List<DtoSyle_id_name> ProductStyles,
-     int Stock,
-
-     int CategoryId,
-
-     bool IsActive = true
-     )
-    {
-        public List<DtoSyle_id_name> ProductStyles { get; init; } = ProductStyles ?? new List<DtoSyle_id_name>();
-    }
+        string Name,
+        string Description,
+        decimal Price,
+        string FrontImageUrl,
+        string BackImageUrl,
+        List<DtoSyle_id_name> ProductStyles,
+        int Stock,
+        int CategoryId,
+        bool IsActive
+    );
 }
 
 

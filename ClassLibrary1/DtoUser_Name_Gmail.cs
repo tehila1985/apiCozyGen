@@ -9,14 +9,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Dto
 {
     public record DtoUser_Name_Gmail(
-          int UserId,
-          [property: Required(ErrorMessage = "Gmail is required")]
-        [property: EmailAddress(ErrorMessage = "Invalid email format.")]
+        int UserId,
         string Email,
-          string FirstName,
-          string LastName,
-          string Role
-      );
+        string FirstName,
+        string LastName,
+        string Role
+    );
 
 }
 

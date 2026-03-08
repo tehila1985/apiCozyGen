@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 namespace Dto
 {
     public record DtoProductStyle(
-    [property: Key] int ProductStyleId,
-    int ProductId,
-    int StyleId
-);
+        int ProductStyleId,
+        int ProductId,
+        int StyleId
+    );
 
 }
 //public class DtoProductStyle
