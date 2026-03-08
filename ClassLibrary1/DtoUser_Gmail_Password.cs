@@ -8,4 +8,4 @@ namespace Dto
         string Email,
         string PasswordHash
     );
-
+}
