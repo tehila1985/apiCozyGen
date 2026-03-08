@@ -33,9 +33,9 @@ namespace project1.Controllers
 
         // GET api/<users>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<DtoUser_Name_Gmail>> Get(int id)
+        public async Task<ActionResult<DtoUser_Name_Gmail_Role_Id>> Get(int id)
         {
-            DtoUser_Name_Gmail user = await _s.GetUserById(id);
+            DtoUser_Name_Gmail_Role_Id user = await _s.GetUserById(id);
             if (user!=null)
             {
                 return Ok(user);
@@ -45,10 +45,10 @@ namespace project1.Controllers
         // POST api/<users>
 
         [HttpPost]
-        public async Task<ActionResult<DtoUser_Id_Name>> Post([FromBody] DtoUser_Name_Password_Gmail user)
+        public async Task<ActionResult<DtoUser_Name_Gmail_Role_Id>> Post([FromBody] DtoUser_All user)
         {
 
-            DtoUser_Id_Name res = await _s.AddNewUser(user);
+            DtoUser_Name_Gmail_Role_Id res = await _s.AddNewUser(user);
             if (res!=null)
             {
                 return CreatedAtAction(nameof(Get), new { id = res.UserId }, res);
@@ -59,9 +59,9 @@ namespace project1.Controllers
 
         //POST
         [HttpPost("Login")]
-        public async Task<ActionResult<DtoUser_Id_Name>> Login([FromBody] DtoUser_Gmail_Password user)
+        public async Task<ActionResult<DtoUser_Name_Gmail_Role_Id>> Login([FromBody] DtoUser_Gmail_Password user)
         {
-            DtoUser_Id_Name res = await _s.Login(user);
+            DtoUser_Name_Gmail_Role_Id res = await _s.Login(user);
             if(res!=null)
             {
                 _logger.LogInformation($"login attempted with user name,{user.Email} and password {user.PasswordHash}");
@@ -74,9 +74,9 @@ namespace project1.Controllers
 
         // PUT api/<users>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<DtoUser_Id_Name>> Put(int id, [FromBody] DtoUser_Name_Password_Gmail value)
+        public async Task<ActionResult<DtoUser_Name_Gmail_Role_Id>> Put(int id, [FromBody] DtoUser_All value)
         {
-            DtoUser_Id_Name res = await _s.update(id, value);
+            DtoUser_Name_Gmail_Role_Id res = await _s.update(id, value);
             if (res!= null)
             {
                 return CreatedAtAction(nameof(Get), new { id = res.UserId }, res);

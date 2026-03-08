@@ -23,40 +23,40 @@ namespace Services
         {
             return await _r.GetUsers();
         }
-        public async Task<DtoUser_Name_Gmail?> GetUserById(int id)
+        public async Task<DtoUser_Name_Gmail_Role_Id?> GetUserById(int id)
         {
             var u = await _r.GetUserById(id);
-            var r = _mapper.Map<User, DtoUser_Name_Gmail>(u);
+            var r = _mapper.Map<User, DtoUser_Name_Gmail_Role_Id>(u);
             return r;
         }
-        public async Task<DtoUser_Id_Name> AddNewUser(DtoUser_Name_Password_Gmail user)
+        public async Task<DtoUser_Name_Gmail_Role_Id> AddNewUser(DtoUser_All user)
         {
             int d = _passwordService.getStrengthByPassword(user.PasswordHash);
             if (d >= 2)
             {
                 
-                var userEntity = _mapper.Map<DtoUser_Name_Password_Gmail, User>(user);
+                var userEntity = _mapper.Map<DtoUser_All, User>(user);
                 userEntity.Role = "Customer";
                 var res = await _r.AddNewUser(userEntity);
-                var dtoUser = _mapper.Map<User, DtoUser_Id_Name>(res);
+                var dtoUser = _mapper.Map<User, DtoUser_Name_Gmail_Role_Id>(res);
                 return dtoUser;
             }
 
             return null;
         }
 
-        public async Task<DtoUser_Id_Name?> Login(DtoUser_Gmail_Password value)
+        public async Task<DtoUser_Name_Gmail_Role_Id?> Login(DtoUser_Gmail_Password value)
         {
             var a = _mapper.Map<DtoUser_Gmail_Password, User>(value);
             var u = await _r.Login(a);
 
             if (u == null) return null;
 
-            var dtoUser = _mapper.Map<User, DtoUser_Id_Name>(u);
+            var dtoUser = _mapper.Map<User, DtoUser_Name_Gmail_Role_Id>(u);
             return dtoUser;
         }
        
-        public async Task<DtoUser_Id_Name> update(int id, DtoUser_Name_Password_Gmail userDto)
+        public async Task<DtoUser_Name_Gmail_Role_Id> update(int id, DtoUser_All userDto)
         {
            
             int d = _passwordService.getStrengthByPassword(userDto.PasswordHash);
@@ -68,7 +68,7 @@ namespace Services
             existingUser.UserId = id;
             var res = await _r.update(id, existingUser);
 
-            return _mapper.Map<User, DtoUser_Id_Name>(res);
+            return _mapper.Map<User, DtoUser_Name_Gmail_Role_Id>(res);
         }
       
         public async Task<bool> IsAdminById(int id, string password)

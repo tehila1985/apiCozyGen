@@ -2,7 +2,7 @@
 
 namespace Dto
 {
-    public record DtoUser_Name_Password_Gmail(
+    public record DtoUser_All(
         int UserId,
         string Email,
         string FirstName,

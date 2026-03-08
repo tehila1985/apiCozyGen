@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Dto;
 using Repository.Models;
 namespace Api
@@ -10,10 +10,9 @@ namespace Api
             CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>();
             CreateMap<User, DtoUser_Gmail_Password>().ReverseMap();
             CreateMap<Style,DtoSyle_id_name>().ReverseMap();
-            CreateMap<User, DtoUser_Id_Name>().ReverseMap();
             //CreateMap<PassWord, DtoPassword_Password_Strength>().ReverseMap();
-            CreateMap<User, DtoUser_Name_Password_Gmail>().ReverseMap();
-            CreateMap<User, DtoUser_Name_Gmail>().ReverseMap();
+            CreateMap<User, DtoUser_All>().ReverseMap();
+            CreateMap<User, DtoUser_Name_Gmail_Role_Id>().ReverseMap();
             CreateMap<Category, DtoCategory_Name_Id>().ReverseMap();
             CreateMap<Category, DtocategoryAll>().ReverseMap();
 
