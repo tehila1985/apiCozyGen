@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace Dto
 {
-
     public record DtoProduct_Id_Name_Category_Price_Desc_Image(
         int ProductId,
         string Name,

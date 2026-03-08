@@ -14,11 +14,3 @@ namespace Dto
         string Role
     );
 }
-
-
-//public class DtoUser_Id_Name
-//{
-//    public string? UserId { get; set; }
-//    public string FirstName { get; set; }
-//    public string Role { get; set; }
-//}

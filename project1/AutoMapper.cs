@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Dto;
 using Repository.Models;
 namespace Api
@@ -7,7 +7,7 @@ namespace Api
     {
         public AutoMapper()
         {
-            CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>().ReverseMap();
+            CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>();
             CreateMap<User, DtoUser_Gmail_Password>().ReverseMap();
             CreateMap<Style,DtoSyle_id_name>().ReverseMap();
             CreateMap<User, DtoUser_Id_Name>().ReverseMap();
@@ -22,7 +22,7 @@ namespace Api
             //CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>().ForMember(dest => dest.Name,
             //                                              opts => opts.MapFrom(src => src.Category.Name));
             CreateMap<Product, DtoProduct_Id_Name_Category_Price_Desc_Image>()
-                           .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name)).ReverseMap();
+                           .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
             CreateMap<Order, DtoOrder_Id_UserId_Date_Sum_OrderItems>()
                 .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems)).ReverseMap();
             CreateMap<OrderItem, DtoOrderItem_Id_OrderId_ProductId_Quantity>()
