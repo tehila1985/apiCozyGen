@@ -96,11 +96,9 @@ namespace Api.Controllers
                     await image.CopyToAsync(stream);
 
                 var styleDto = new DtoStyleAll(
-                
-                    Name: name,
-                    Description : description,
-                    ImageUrl : $"/uploads/styles/{fileName}"
-               
+                    name,
+                    description,
+                    $"/uploads/styles/{fileName}"
                 );
 
                 var result = await _s.AddNewStyle(styleDto);

@@ -8,18 +8,11 @@ using System.Threading.Tasks;
 namespace Dto
 {
     public record DtoSyle_id_name(
-     int StyleId,
-
-     [property: Required]
-    [property: StringLength(150)]
-    string Name,
-
-     [property: StringLength(500)]
-    string Description,
-
-     [property: StringLength(500)]
-    string ImageUrl
- );
+        int StyleId,
+        string Name,
+        string Description,
+        string ImageUrl
+    );
 }
 
 

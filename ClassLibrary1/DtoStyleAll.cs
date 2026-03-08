@@ -9,16 +9,10 @@ using System.Threading.Tasks;
 namespace Dto
 {
     public record DtoStyleAll(
-     [property: Required]
-    [property: StringLength(150)]
-    string Name,
-
-     [property: StringLength(500)]
-    string Description,
-
-     [property: StringLength(500)]
-    string ImageUrl
- );
+        string Name,
+        string Description,
+        string ImageUrl
+    );
 }
 //public class DtoStyleAll
 //{

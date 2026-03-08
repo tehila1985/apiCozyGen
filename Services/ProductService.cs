@@ -33,8 +33,8 @@ namespace Services
             var u = await _r.getProducts(position, skip, desc, minPrice, maxPrice, categoryIds, styleIds);
             var r = _mapper.Map<List<Product>, List<DtoProduct_Id_Name_Category_Price_Desc_Image>>(u.Items);
             var n = new Dto_result_product(
-                Products: r,
-                TotalCount: u.TotalCount
+                r,
+                u.TotalCount
             );
             return n;
         }

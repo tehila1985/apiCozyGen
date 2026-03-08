@@ -9,12 +9,8 @@ using System.Threading.Tasks;
 namespace Dto
 {
     public record DtocategoryAll(
-        [property: Required]
-        [property: StringLength(150)]
         string Name,
-        [property: StringLength(500)]
         string Description,
-        [property: StringLength(500)]
         string ImageUrl
     );
 }

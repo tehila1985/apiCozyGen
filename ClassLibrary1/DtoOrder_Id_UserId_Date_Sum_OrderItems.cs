@@ -10,15 +10,13 @@ using System.Text;
 namespace Dto
 {
     public record DtoOrder_Id_UserId_Date_Sum_OrderItems(
-            int OrderId, int UserId,
-            [property: Column(TypeName = "datetime")]
-            DateTime OrderDate,
-            [property: Required, StringLength(50)]
-            string Status,
-            [property: Column(TypeName = "decimal(10, 2)")]
-            decimal TotalPrice,
-            ICollection<DtoOrderItem_Id_OrderId_ProductId_Quantity> OrderItems
-        );
+        int OrderId,
+        int UserId,
+        DateTime OrderDate,
+        string Status,
+        decimal TotalPrice,
+        ICollection<DtoOrderItem_Id_OrderId_ProductId_Quantity> OrderItems
+    );
 }
 
 
