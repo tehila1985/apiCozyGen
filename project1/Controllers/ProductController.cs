@@ -81,6 +81,29 @@ namespace Api.Controllers
             return await _s.GetById(id);
         }
 
+        // ===== נוסף עבור הקריאה ל-AI - מחזיר מוצרים לפי רשימת IDs =====
+        [HttpGet("by-ids")]
+        public async Task<List<DtoProduct_Id_Name_Category_Price_Desc_Image>> GetByIds([FromQuery] int[] ids)
+        {
+            var products = new List<DtoProduct_Id_Name_Category_Price_Desc_Image>();
+            
+            foreach (var id in ids)
+            {
+                try
+                {
+                    var product = await _s.GetById(id);
+                    if (product != null)
+                        products.Add(product);
+                }
+                catch
+                {
+                    // אם מוצר לא נמצא, פשוט נדלג עליו
+                }
+            }
+            
+            return products;
+        }
+
         // ===== נוסף עבור העלאת תמונות למנהל - התחלה =====
         [HttpPost("upload")]
         public async Task<IActionResult> UploadProductWithImages(

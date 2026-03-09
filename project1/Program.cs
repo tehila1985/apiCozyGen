@@ -46,6 +46,9 @@ builder.Services.AddScoped<IStyleService, StyleService>();
 builder.Services.AddScoped<IStyleRepository, StyleRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddHttpClient<IAiService, AiService>();
+// ===== נוסף עבור הקריאה ל-AI - רישום שירות AI =====
+builder.Services.AddHttpClient<IAiService, AiService>();
 
 var app = builder.Build();
 
