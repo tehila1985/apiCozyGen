@@ -27,6 +27,24 @@ namespace Api.Controllers
             _logger = logger;
         }
 
+        [HttpPost("chat")]
+        public async Task<IActionResult> Chat([FromBody] DtoChatRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Message))
+                return BadRequest(new { message = "Message is required" });
+
+            try
+            {
+                var response = await _aiService.ChatAsync(request.Message);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Chat Error");
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
         [HttpPost("analyze")]
         public async Task<IActionResult> AnalyzeImage(IFormFile image)
         {

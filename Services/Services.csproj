@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\repository\Repository.csproj" />
+    <ProjectReference Include="..\ClassLibrary1\Dto.csproj" />
   </ItemGroup>
 
 </Project>

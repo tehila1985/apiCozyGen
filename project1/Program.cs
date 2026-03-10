@@ -9,8 +9,12 @@ using NLog.Web;
 using Repository;
 using Repository.Models;
 using Services;
+using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load .env file
+DotNetEnv.Env.Load();
 
 builder.Host.UseNLog();
 
