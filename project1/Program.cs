@@ -71,7 +71,7 @@ app.UseCors("AllowAngular");
 
 app.UseErrorHandling();
 
-//app.UseRating();
+app.UseRating();
 
 // ===== נוסף עבור העלאת תמונות למנהל - מאפשר גישה לקבצים סטטיים =====
 app.UseStaticFiles();
