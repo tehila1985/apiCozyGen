@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dto;
-using Microsoft.Extensions.Logging;
 using Repository;
 using Repository.Models;
 using System;
@@ -15,13 +14,11 @@ namespace Services
     {
         IOrderRepository _r;
         IMapper _mapper;
-        ILogger<OrderService> _logger;
 
-        public OrderService(IOrderRepository i, IMapper mapperr, ILogger<OrderService> logger)
+        public OrderService(IOrderRepository i, IMapper mapperr)
         {
             _mapper = mapperr;
             _r = i;
-            _logger = logger;
         }
         public async Task<List<DtoOrder_Id_UserId_Date_Sum_OrderItems?>> GetOrdersUser(int id)
         {
@@ -39,15 +36,6 @@ namespace Services
 
         public async Task<DtoOrder_Id_UserId_Date_Sum_OrderItems> AddNewOrder(DtoOrder_Id_UserId_Date_Sum_OrderItems order)
         {
-            var calculatedTotal = order.OrderItems.Sum(item => item.PriceAtPurchase * item.Quantity);
-            if (order.TotalPrice != calculatedTotal)
-            {
-                _logger.LogWarning("Order sum mismatch. UserId: {UserId}, SentTotalPrice: {SentTotalPrice}, CalculatedTotalPrice: {CalculatedTotalPrice}",
-                    order.UserId,
-                    order.TotalPrice,
-                    calculatedTotal);
-            }
-
             var ooo = _mapper.Map<DtoOrder_Id_UserId_Date_Sum_OrderItems, Order>(order);
             Order o = await _r.AddNewOrder(ooo);
             var oo = _mapper.Map<Order, DtoOrder_Id_UserId_Date_Sum_OrderItems>(o);
