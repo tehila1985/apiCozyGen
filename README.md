@@ -71,4 +71,3 @@ The `Tests` project includes:
 
 ---
 
-If needed, this README can be extended with endpoint documentation, deployment instructions, and environment setup templates.
