@@ -17,12 +17,6 @@ namespace Api.Controllers
             _logger = logger;
         }
 
-        //// GET api/<PasswordController>/5
-        //[HttpGet("{id}")]
-        //public DtoPassword_Password_Strength Get(PassWord p)
-        //{
-        //    return _p.getStrengthByPassword(p);
-        //}
 
         [HttpPost]
         

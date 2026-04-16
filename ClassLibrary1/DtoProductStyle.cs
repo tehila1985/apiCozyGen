@@ -15,12 +15,3 @@ namespace DTOs
     );
 
 }
-//public class DtoProductStyle
-//{
-//    [Key]
-//    public int ProductStyleId { get; set; }
-
-//    public int ProductId { get; set; }
-
-//    public int StyleId { get; set; }
-//}
