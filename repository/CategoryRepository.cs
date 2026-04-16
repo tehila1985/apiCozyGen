@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Repository;
-using Repository.Models;
+using Entities;
 namespace Repository
 {
   public class CategoryRepository : ICategoryRepository

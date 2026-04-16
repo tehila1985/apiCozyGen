@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Dto;
+using DTOs;
 using Microsoft.EntityFrameworkCore;
 using Repository;
-using Repository.Models;
+using Entities;
 using System.Text.Json;
 namespace Services
 {

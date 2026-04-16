@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dto
+namespace DTOs
 {
     public record DtoSyle_id_name(
         int StyleId,

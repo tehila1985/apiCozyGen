@@ -1,4 +1,4 @@
-﻿using Dto;
+﻿
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dto
+namespace DTOs
 {
     public record DtoProduct_Id_Name_Category_Price_Desc_Image(
         int ProductId,

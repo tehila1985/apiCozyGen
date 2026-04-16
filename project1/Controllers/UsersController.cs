@@ -4,8 +4,8 @@ using System.Collections.Specialized;
 using System.Text.Json;
 using Services;
 using static project1.Controllers.Userscontroller;
-using Dto;
-using Repository.Models;
+using DTOs;
+using Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

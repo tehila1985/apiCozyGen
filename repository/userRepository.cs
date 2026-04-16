@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-
-using Repository.Models;
+using Entities;
 using System.Collections.Specialized;
 using System.Reflection.PortableExecutable;
 using System.Text.Json;

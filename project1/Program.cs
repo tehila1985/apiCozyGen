@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NLog.Web;
 using Repository;
-using Repository.Models;
+using Entities;
 using Services;
 using DotNetEnv;
 

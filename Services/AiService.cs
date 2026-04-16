@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using System;
-using Dto;
+using DTOs;
 using Microsoft.Extensions.Configuration;
 
 namespace Services

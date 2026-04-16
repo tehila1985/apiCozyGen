@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Repository;
-using Repository.Models;
+using Entities;
 using Xunit;
 
 namespace Test

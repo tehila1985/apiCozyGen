@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Models;
+namespace Entities;
 
 [Index("Name", Name = "UQ__Styles__737584F640BD6215", IsUnique = true)]
 public partial class Style

@@ -1,7 +1,6 @@
 ﻿using Entities;
 using Microsoft.Data.SqlClient; 
 using Microsoft.Extensions.Configuration;
-using Repository.Models;
 using System.Data;
 
 namespace Repository

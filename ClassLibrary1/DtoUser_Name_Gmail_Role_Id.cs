@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
 
-namespace Dto
+namespace DTOs
 {
     public record DtoUser_Name_Gmail_Role_Id(
         int UserId,

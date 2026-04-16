@@ -1,5 +1,4 @@
-﻿using Dto;
-using System;
+﻿
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dto
+namespace DTOs
 {
     public record DtoProduct_Name_Description_Price_Stock_CategoryId_IsActive_StyleIds(
         string Name,

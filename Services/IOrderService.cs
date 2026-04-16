@@ -1,5 +1,4 @@
-﻿using Dto;
-
+﻿using DTOs;
 namespace Services
 {
     public interface IOrderService

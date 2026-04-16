@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dto
+namespace DTOs
 {
     public record DtoUser_All(
         int UserId,

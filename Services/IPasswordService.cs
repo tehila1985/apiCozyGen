@@ -1,6 +1,5 @@
 ﻿
-using Dto;
-
+using DTOs;
 
 namespace Services
 {

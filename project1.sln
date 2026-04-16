@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Servic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "repository\Repository.csproj", "{30583CDB-A712-4C7F-9ACF-A185F01930BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "User\Model.csproj", "{F4C0AFC5-FCDC-45C1-82E1-5599C5187D1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "User\Entities.csproj", "{F4C0AFC5-FCDC-45C1-82E1-5599C5187D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dto", "ClassLibrary1\Dto.csproj", "{0A149FA2-5AAF-41B9-A16C-6A6964108B0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "ClassLibrary1\DTOs.csproj", "{0A149FA2-5AAF-41B9-A16C-6A6964108B0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{C0A9BE09-DBA2-4AA7-99FA-C04D8D285E9D}"
 EndProject

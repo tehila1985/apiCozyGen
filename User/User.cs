@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Models;
+namespace Entities;
 
 [Index("Email", Name = "UQ__Users__A9D105347DC6AC4A", IsUnique = true)]
 public partial class User

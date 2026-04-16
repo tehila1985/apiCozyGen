@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Models;
+namespace Repository;
 
 public partial class myDBContext : DbContext
 {

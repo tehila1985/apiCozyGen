@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Repository.Models;
+using Entities;
+using Repository;
 using System;
 using System.Linq;
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Dto
+namespace DTOs
 {
     public record DtoCategory_Name_Id(
         int CategoryId,

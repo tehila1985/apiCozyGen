@@ -1,4 +1,4 @@
-﻿using Dto;
+﻿using DTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 
-namespace Dto
+namespace DTOs
 {
 
     public class DtoOrder_Id_UserId_Date_Sum_OrderItems

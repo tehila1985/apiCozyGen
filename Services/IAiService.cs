@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dto;
-
+using DTOs;
 namespace Services
 {
     public interface IAiService

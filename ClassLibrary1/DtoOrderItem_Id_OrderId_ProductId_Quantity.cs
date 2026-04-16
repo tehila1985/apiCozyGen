@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dto
+namespace DTOs
 {
     public class DtoOrderItem_Id_OrderId_ProductId_Quantity
     {

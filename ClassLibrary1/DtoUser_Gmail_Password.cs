@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 
-namespace Dto
+namespace DTOs
 {
     public record DtoUser_Gmail_Password(
         string Email,

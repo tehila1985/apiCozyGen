@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using Repository.Models;
-
+using Entities;
 namespace Repository
 {
   public interface IProductRepository

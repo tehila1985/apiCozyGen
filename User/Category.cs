@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Repository.Models;
+namespace Entities;
 
 [Index("Name", Name = "UQ__Categori__737584F6F8D67F16", IsUnique = true)]
 public partial class Category
