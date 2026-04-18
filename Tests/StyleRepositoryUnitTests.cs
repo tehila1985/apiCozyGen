@@ -24,7 +24,7 @@ namespace Test
             mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
 
             var repository = new StyleRepository(mockContext.Object);
@@ -47,7 +47,7 @@ namespace Test
             mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
 
             var repository = new StyleRepository(mockContext.Object);
@@ -71,7 +71,7 @@ namespace Test
             mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
 
             var repository = new StyleRepository(mockContext.Object);
@@ -101,7 +101,7 @@ namespace Test
             mockSet.As<IQueryable<Style>>().Setup(m => m.GetEnumerator()).Returns(styles.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Style>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Style>(styles.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Styles).Returns(mockSet.Object);
 
             var repository = new StyleRepository(mockContext.Object);

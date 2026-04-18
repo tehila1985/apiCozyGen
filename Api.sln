@@ -1,17 +1,17 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36301.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "project1\Api.csproj", "{6A04CF52-2815-4C8E-B399-16C79C619648}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{6A04CF52-2815-4C8E-B399-16C79C619648}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{A53A13D5-2B20-405C-A554-7E7BF8AED6E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "repository\Repository.csproj", "{30583CDB-A712-4C7F-9ACF-A185F01930BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{30583CDB-A712-4C7F-9ACF-A185F01930BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "User\Entities.csproj", "{F4C0AFC5-FCDC-45C1-82E1-5599C5187D1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{F4C0AFC5-FCDC-45C1-82E1-5599C5187D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "ClassLibrary1\DTOs.csproj", "{0A149FA2-5AAF-41B9-A16C-6A6964108B0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTOs", "DTOs\DTOs.csproj", "{0A149FA2-5AAF-41B9-A16C-6A6964108B0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{C0A9BE09-DBA2-4AA7-99FA-C04D8D285E9D}"
 EndProject

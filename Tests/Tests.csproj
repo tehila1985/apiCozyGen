@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\project1\Api.csproj" />
-    <ProjectReference Include="..\repository\Repository.csproj" />
+    <ProjectReference Include="..\Api\Api.csproj" />
+    <ProjectReference Include="..\Repository\Repository.csproj" />
   </ItemGroup>
 
   <ItemGroup>

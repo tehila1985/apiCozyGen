@@ -27,7 +27,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Equal(2, result.TotalCount);
             Assert.Equal(2, result.Items.Count);
@@ -46,7 +46,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, "sofa", null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, "sofa", null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal("Sofa", result.Items[0].Name);
@@ -65,7 +65,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, 400, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, 400, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal("Sofa", result.Items[0].Name);
@@ -84,7 +84,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, 200, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, null, 200, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal("Chair", result.Items[0].Name);
@@ -104,7 +104,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, 200, 400, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, 200, 400, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal("Table", result.Items[0].Name);
@@ -124,7 +124,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, null, new int?[] { category1.CategoryId }, Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, null, null, new int?[] { category1.CategoryId }, Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.Equal("Sofa", result.Items[0].Name);
@@ -153,7 +153,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), new int?[] { style1.StyleId });
+            var result = await repository.GetProducts(1, 10, null, null, null, Array.Empty<int?>(), new int?[] { style1.StyleId });
 
             Assert.Single(result.Items);
             Assert.Equal("Sofa", result.Items[0].Name);
@@ -174,7 +174,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(2, 2, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(2, 2, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Equal(5, result.TotalCount);
             Assert.Equal(2, result.Items.Count);
@@ -194,7 +194,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Equal(3, result.Items.Count);
             Assert.Equal("Cheap", result.Items[0].Name);
@@ -242,7 +242,7 @@ namespace Test
             await _fixture.Context.SaveChangesAsync();
 
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, null, null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Single(result.Items);
             Assert.NotNull(result.Items[0].Category);
@@ -253,7 +253,7 @@ namespace Test
         public async Task GetProducts_ReturnsEmpty_WhenNoProductsMatchFilters()
         {
             var repository = new ProductRepository(_fixture.Context);
-            var result = await repository.getProducts(1, 10, "nonexistent", null, null, Array.Empty<int?>(), Array.Empty<int?>());
+            var result = await repository.GetProducts(1, 10, "nonexistent", null, null, Array.Empty<int?>(), Array.Empty<int?>());
 
             Assert.Empty(result.Items);
             Assert.Equal(0, result.TotalCount);

@@ -35,7 +35,7 @@ namespace Test
             mockSet.As<IQueryable<Order>>().Setup(m => m.ElementType).Returns(orders.AsQueryable().ElementType);
             mockSet.As<IQueryable<Order>>().Setup(m => m.GetEnumerator()).Returns(orders.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Orders).Returns(mockSet.Object);
 
             var repository = new OrderRepository(mockContext.Object);
@@ -58,7 +58,7 @@ namespace Test
             mockSet.As<IQueryable<Order>>().Setup(m => m.ElementType).Returns(orders.AsQueryable().ElementType);
             mockSet.As<IQueryable<Order>>().Setup(m => m.GetEnumerator()).Returns(orders.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Orders).Returns(mockSet.Object);
 
             var repository = new OrderRepository(mockContext.Object);
@@ -71,7 +71,7 @@ namespace Test
         public async Task AddNewOrder_AddsOrderToDatabase()
         {
             var mockSet = new Mock<DbSet<Order>>();
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Orders).Returns(mockSet.Object);
             mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
@@ -121,7 +121,7 @@ namespace Test
             mockSet.As<IQueryable<Order>>().Setup(m => m.ElementType).Returns(orders.AsQueryable().ElementType);
             mockSet.As<IQueryable<Order>>().Setup(m => m.GetEnumerator()).Returns(orders.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Orders).Returns(mockSet.Object);
 
             var repository = new OrderRepository(mockContext.Object);
@@ -135,8 +135,11 @@ namespace Test
         public async Task AddNewOrder_WithOrderItems_AddsSuccessfully()
         {
             var mockSet = new Mock<DbSet<Order>>();
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockProductSet = new Mock<DbSet<Product>>();
+            mockProductSet.Setup(m => m.FindAsync(It.IsAny<object[]>())).ReturnsAsync((Product?)null);
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Orders).Returns(mockSet.Object);
+            mockContext.Setup(c => c.Products).Returns(mockProductSet.Object);
             mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
             var repository = new OrderRepository(mockContext.Object);

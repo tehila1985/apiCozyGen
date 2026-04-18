@@ -141,7 +141,7 @@ namespace Test
             user.FirstName = "Updated";
             user.IsClubMember = true;
             
-            var result = await repository.update(user.UserId, user);
+            var result = await repository.Update(user.UserId, user);
 
             Assert.Equal("Updated", result.FirstName);
             Assert.True(result.IsClubMember);

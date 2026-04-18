@@ -12,7 +12,7 @@ namespace Test
         public async Task AddNewProduct_AddsProductToDatabase()
         {
             var mockSet = new Mock<DbSet<Product>>();
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Products).Returns(mockSet.Object);
             mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 

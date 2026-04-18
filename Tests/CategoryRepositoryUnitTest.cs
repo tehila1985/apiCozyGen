@@ -24,7 +24,7 @@ namespace Test
             mockSet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(categories.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Category>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Category>(categories.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Categories).Returns(mockSet.Object);
 
             var repository = new CategoryRepository(mockContext.Object);
@@ -47,7 +47,7 @@ namespace Test
             mockSet.As<IQueryable<Category>>().Setup(m => m.GetEnumerator()).Returns(categories.GetEnumerator());
             mockSet.As<IAsyncEnumerable<Category>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<Category>(categories.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Categories).Returns(mockSet.Object);
 
             var repository = new CategoryRepository(mockContext.Object);
