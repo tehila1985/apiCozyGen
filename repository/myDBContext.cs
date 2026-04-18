@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Repository;
 
-public partial class myDBContext : DbContext
+public partial class MyDbContext : DbContext
 {
-    public myDBContext(DbContextOptions<myDBContext> options)
+    public MyDbContext(DbContextOptions<MyDbContext> options)
         : base(options)
     {
     }

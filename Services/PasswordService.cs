@@ -17,7 +17,7 @@ namespace Services
             mapper = mapperr;
         }
 
-        public int getStrengthByPassword(string p)
+        public int GetStrengthByPassword(string p)
         {
 
             var result = Zxcvbn.Core.EvaluatePassword(p);

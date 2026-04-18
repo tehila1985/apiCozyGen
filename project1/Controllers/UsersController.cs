@@ -76,7 +76,7 @@ namespace project1.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<DtoUser_Name_Gmail_Role_Id>> Put(int id, [FromBody] DtoUser_All value)
         {
-            DtoUser_Name_Gmail_Role_Id res = await _s.update(id, value);
+            DtoUser_Name_Gmail_Role_Id res = await _s.Update(id, value);
             if (res!= null)
             {
                 return CreatedAtAction(nameof(Get), new { id = res.UserId }, res);

@@ -7,7 +7,7 @@ namespace Repository
   {
         
         Task<Product> AddNewProduct(Product product);
-       Task<(List<Product> Items, int TotalCount)> getProducts([FromQuery] int position,
+       Task<(List<Product> Items, int TotalCount)> GetProducts([FromQuery] int position,
            [FromQuery] int skip,
            [FromQuery] string? desc,
            [FromQuery] int? minPrice,

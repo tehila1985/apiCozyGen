@@ -31,7 +31,7 @@ namespace Services
         }
         public async Task<DtoUser_Name_Gmail_Role_Id> AddNewUser(DtoUser_All user)
         {
-            int d = _passwordService.getStrengthByPassword(user.PasswordHash);
+            int d = _passwordService.GetStrengthByPassword(user.PasswordHash);
             if (d >= 2)
             {
                 
@@ -56,17 +56,17 @@ namespace Services
             return dtoUser;
         }
        
-        public async Task<DtoUser_Name_Gmail_Role_Id> update(int id, DtoUser_All userDto)
+        public async Task<DtoUser_Name_Gmail_Role_Id> Update(int id, DtoUser_All userDto)
         {
-           
-            int d = _passwordService.getStrengthByPassword(userDto.PasswordHash);
+
+            int d = _passwordService.GetStrengthByPassword(userDto.PasswordHash);
             if (d < 2) return null;
 
             var existingUser = await _r.GetUserById(id);
             if (existingUser == null) return null;
             _mapper.Map(userDto, existingUser);
             existingUser.UserId = id;
-            var res = await _r.update(id, existingUser);
+            var res = await _r.Update(id, existingUser);
 
             return _mapper.Map<User, DtoUser_Name_Gmail_Role_Id>(res);
         }

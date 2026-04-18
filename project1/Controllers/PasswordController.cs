@@ -22,7 +22,7 @@ namespace Api.Controllers
         
         public int Post([FromBody] string p)
         {
-            return _p.getStrengthByPassword(p);
+            return _p.GetStrengthByPassword(p);
         }
 
 

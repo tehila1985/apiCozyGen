@@ -20,7 +20,7 @@ namespace Api.Controllers
             _userService = userService;
         }
 
-        // GET: api/<CategoryController>
+
         [HttpGet]
         public async Task<IEnumerable<DtoCategory_Name_Id>> Get()
         {

@@ -10,26 +10,26 @@ namespace Repository
 {
   public class CategoryRepository : ICategoryRepository
   {
-    myDBContext dbContext;
-    public CategoryRepository(myDBContext dbContext)
+    private MyDbContext _dbContext;
+    public CategoryRepository(MyDbContext dbContext)
     {
-      this.dbContext = dbContext;
+      _dbContext = dbContext;
     }
     public async Task<List<Category>> GetCategories()
     {
-      return await dbContext.Categories.ToListAsync();
+      return await _dbContext.Categories.ToListAsync();
     }
     public async Task<Category> AddNewCategory(Category category)
         {
 
-            await dbContext.Categories.AddAsync(category);
-            await dbContext.SaveChangesAsync();
+            await _dbContext.Categories.AddAsync(category);
+            await _dbContext.SaveChangesAsync();
             return category;
         }
         public async Task<Category> Delete(int id)
         {
             
-            var category = await dbContext.Categories
+            var category = await _dbContext.Categories
                 .Include(c => c.Products)
                 .FirstOrDefaultAsync(c => c.CategoryId == id);
 
@@ -37,11 +37,11 @@ namespace Repository
             {
                 if (category.Products != null && category.Products.Any())
                 {
-                    dbContext.Products.RemoveRange(category.Products);
+                    _dbContext.Products.RemoveRange(category.Products);
                 }
-                dbContext.Categories.Remove(category);
+                _dbContext.Categories.Remove(category);
 
-                await dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync();
             }
             return category;
         }

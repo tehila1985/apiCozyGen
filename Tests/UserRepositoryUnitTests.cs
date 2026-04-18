@@ -24,7 +24,7 @@ namespace Test
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
             mockSet.As<IAsyncEnumerable<User>>().Setup(m => m.GetAsyncEnumerator(default)).Returns(new TestAsyncEnumerator<User>(users.GetEnumerator()));
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
             var repository = new UserRepository(mockContext.Object);
@@ -49,7 +49,7 @@ namespace Test
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
             var repository = new UserRepository(mockContext.Object);
@@ -71,7 +71,7 @@ namespace Test
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
             var repository = new UserRepository(mockContext.Object);
@@ -84,13 +84,13 @@ namespace Test
         public async Task AddNewUser_AddsUserToDatabase()
         {
             var mockSet = new Mock<DbSet<User>>();
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
             mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
             var repository = new UserRepository(mockContext.Object);
             var newUser = new User { Email = "new@test.com", PasswordHash = "hash", FirstName = "New", LastName = "User", Role = "User", IsClubMember = false };
-            
+
             var result = await repository.AddNewUser(newUser);
 
             mockSet.Verify(m => m.AddAsync(newUser, default), Times.Once);
@@ -112,7 +112,7 @@ namespace Test
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
             var repository = new UserRepository(mockContext.Object);
@@ -138,7 +138,7 @@ namespace Test
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(users.AsQueryable().ElementType);
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(users.GetEnumerator());
 
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
             var repository = new UserRepository(mockContext.Object);
@@ -153,14 +153,14 @@ namespace Test
         public async Task Update_UpdatesUserInDatabase()
         {
             var mockSet = new Mock<DbSet<User>>();
-            var mockContext = new Mock<myDBContext>(new DbContextOptions<myDBContext>());
+            var mockContext = new Mock<MyDbContext>(new DbContextOptions<MyDbContext>());
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
             mockContext.Setup(c => c.SaveChangesAsync(default)).ReturnsAsync(1);
 
             var repository = new UserRepository(mockContext.Object);
             var updatedUser = new User { UserId = 1, Email = "updated@test.com", PasswordHash = "hash", FirstName = "Updated", LastName = "User", Role = "User", IsClubMember = true };
-            
-            var result = await repository.update(1, updatedUser);
+
+            var result = await repository.Update(1, updatedUser);
 
             mockSet.Verify(m => m.Update(updatedUser), Times.Once);
             mockContext.Verify(m => m.SaveChangesAsync(default), Times.Once);

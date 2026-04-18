@@ -8,14 +8,14 @@ namespace Test
 {
     public class DatabaseFixture : IDisposable
     {
-        public myDBContext Context { get; private set; }
+        public MyDbContext Context { get; private set; }
 
         public DatabaseFixture()
         {
-            var options = new DbContextOptionsBuilder<myDBContext>()
+            var options = new DbContextOptionsBuilder<MyDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-            Context = new myDBContext(options);
+            Context = new MyDbContext(options);
         }
 
         public void ClearDatabase()

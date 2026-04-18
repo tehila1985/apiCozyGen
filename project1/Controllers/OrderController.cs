@@ -10,10 +10,10 @@ namespace Api.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        IOrderService _s;
-        public OrderController(IOrderService i)
+        private IOrderService _orderService;
+        public OrderController(IOrderService orderService)
         {
-            _s = i;
+            _orderService = orderService;
         }
 
 
@@ -21,7 +21,7 @@ namespace Api.Controllers
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<List<DtoOrder_Id_UserId_Date_Sum_OrderItems>>> GetByUser(int userId)
         {
-            var order = await _s.GetOrdersUser(userId);
+            var order = await _orderService.GetOrdersUser(userId);
             if (order != null)
             {
                 return Ok(order);
@@ -34,7 +34,7 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DtoOrder_Id_UserId_Date_Sum_OrderItems>> Get(int id)
         {
-            DtoOrder_Id_UserId_Date_Sum_OrderItems order = await _s.GetOrderById(id);
+            DtoOrder_Id_UserId_Date_Sum_OrderItems order = await _orderService.GetOrderById(id);
             if (order != null)
             {
                 return Ok(order);
@@ -47,7 +47,7 @@ namespace Api.Controllers
         public async Task<ActionResult<DtoOrder_Id_UserId_Date_Sum_OrderItems>> Post([FromBody] DtoOrder_Id_UserId_Date_Sum_OrderItems order)
         {
 
-            DtoOrder_Id_UserId_Date_Sum_OrderItems res = await _s.AddNewOrder(order);
+            DtoOrder_Id_UserId_Date_Sum_OrderItems res = await _orderService.AddNewOrder(order);
             if (res != null)
             {
                 return CreatedAtAction(nameof(Get), new { id = res.OrderId }, res);
