@@ -12,12 +12,12 @@ It follows REST principles and is structured for maintainability, scalability, a
 
 The solution is organized into multiple projects with clear responsibility boundaries:
 
-- `project1` (`Api`) – Controllers, middleware, application startup
-- `Services` – Business logic and orchestration
-- `repository` – Data access and persistence
-- `ClassLibrary1` (`Dto`) – DTO contracts for API/service communication
-- `User` (`Model`) – Domain/entity models
-- `Tests` – Automated unit and integration tests
+- `Api` â€“ Controllers, middleware, application startup
+- `Services` â€“ Business logic and orchestration
+- `repository` â€“ Data access and persistence
+- `Dto` â€“ DTO contracts for API/service communication
+- `Model` â€“ Domain/entity models
+- `Tests` â€“ Automated unit and integration tests
 
 ### Dependency Injection & Decoupling
 
@@ -49,8 +49,8 @@ Environment and runtime settings are externalized via `appsettings` files (for e
 
 The `Tests` project includes:
 
-- `Unit Tests` – validate isolated business and repository behaviors
-- `Integration Tests` – validate end-to-end data access and component integration
+- `Unit Tests` â€“ validate isolated business and repository behaviors
+- `Integration Tests` â€“ validate end-to-end data access and component integration
 
 ## Technology Stack
 
