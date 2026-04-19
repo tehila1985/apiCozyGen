@@ -16,7 +16,7 @@ The solution is organized into multiple projects with clear responsibility bound
 - `Services` – Business logic and orchestration
 - `repository` – Data access and persistence
 - `Dto` – DTO contracts for API/service communication
-- `Model` – Domain/entity models
+- `Entities` – Domain/entity models
 - `Tests` – Automated unit and integration tests
 
 ### Dependency Injection & Decoupling
