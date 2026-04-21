@@ -13,9 +13,12 @@ using DotNetEnv;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load .env file
 DotNetEnv.Env.Load();
 
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetSection("RedisSettings:ConnectionString").Value;
+});
 builder.Host.UseNLog();
 
 builder.Services.AddCors(options =>
